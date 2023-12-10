@@ -1,0 +1,65 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>All Conferences</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">All Conferences</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>Conference Name</td>
+                    <td>Date</td>
+                    <td>Location</td>
+                    <td>Registration Link</td>
+
+
+                </tr>
+                <% conferences.forEach(function(conference){%>
+                    <tr class="entry">
+                        <td class="conference_name">
+                            <%= conference.conf_title %>
+                        </td>
+                        <td>
+                            <a class="date" href="">
+                                <%= formatDate(conference.first_day) %> to <%= formatDate(conference.last_day) %>
+                            </a>
+                        </td>
+                        <td>
+                            <a class="date" href="">
+                                <%= conference.venue %>
+                            </a>
+                        </td>
+                        <td>
+                            <a class="application" href="/register/<%= conference.name %>" target="_blank">
+                                /register/<%= conference.name %>
+                            </a>
+                        </td>
+                        <% }) %>
+
+                    </tr>
+            </table>
+        </div>
+
+        <%- include("partials/footer")-%>
+            <script>
+             <% function formatDate(dateString) { %>
+                <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
+                <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
+                <%       return formattedDate.split("/").join("-"); %>
+               <% } %>
+
+            </script>
+
+    </body>
+
+    </html>

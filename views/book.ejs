@@ -1,0 +1,44 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title> pop_up</title>
+    </head>
+
+    <body>
+        <div class="pop">
+            <a href="/guesthouse"> <img src="images/cross.png" class="cross"></a>
+            <header>
+                Guest house booking
+            </header>
+            <form>
+                <div>
+                    Guest Name:
+                    <input type="text" class="name">
+                </div>
+                <div>
+                    Venue:
+                    <input type="text" class="name">
+                </div>
+                <div>
+                    No. of rooms:
+                    <input type="number" class="No">
+                </div>
+                <div>
+                    Room No:
+                    <input type="number" class="No">
+                </div>
+                <div>
+                    Dates
+                </div>
+                <div>
+                    check in: <input type="date" class="days"> <span> check out: <input type="date" class="days">
+                    </span>
+                </div>
+            </form>
+            <div class="confirm">
+                <button> Confirm Booking </button>
+            </div>
+            <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

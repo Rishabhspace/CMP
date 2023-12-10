@@ -1,0 +1,180 @@
+body {
+    margin: 0;
+}
+
+div {
+    display: block;
+}
+
+.background {
+    background: url('images/bg_img.svg');
+    width: 100%;
+    /* height: 100%; */
+}
+
+.header-image {
+    position: absolute;
+    width: 500px;
+    height: 100px;
+    left: 50px;
+    top: 13.25px;
+}
+
+.logout {
+    position: absolute;
+    left: 96.12%;
+    right: 2.08%;
+    top: 12.83%;
+    bottom: 84.64%;
+}
+
+.logout_text {
+    position: absolute;
+    left: 95.6%;
+    right: 2.08%;
+    margin-top: -0.5%;
+}
+
+.heading {
+    font-size: 150%;
+    color: white;
+    margin: 0;
+    margin-top: 20px;
+    margin-left: 40px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header {
+    position: absolute;
+    width: 100%;
+    height: 72px;
+    top: 120px;
+    background: #4A7EAD;
+    box-shadow: 2px 2px 34.5962px 8.89616px rgba(0, 0, 0, 0.3);
+}
+
+.form {
+    position: absolute;
+    width: 95%;
+    height: 80%;
+    margin-left: 35px;
+    top: 30%;
+    background: #DCE6F0;
+    border-radius: 2px;
+}
+
+.new_conf_form {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    margin-left: 15px;
+    color: #244862;
+}
+
+.info {
+    font-size: 12px;
+}
+
+.para {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.date {
+    margin-bottom: 0;
+}
+
+.date2 {
+    margin-top: 5px;
+    margin-bottom: 22px;
+}
+
+.input-group {
+    display: inline-block;
+    margin-right: 40px;
+}
+
+.heading2 {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.btn {
+    position: absolute;
+    width: 190px;
+    height: 55px;
+    background: #244862;
+    border: 1px solid #FFFFFF;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    align-items: center;
+    color: #FFFFFF;
+}
+
+/* New styles for the 'btn-delete' class */
+.btn-delete {
+    position: absolute;
+    width: 190px;
+    height: 55px;
+    background: #FF0000;
+    /* Red background color */
+    border: 1px solid #FFFFFF;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    align-items: center;
+    color: #FFFFFF;
+    right: 0;
+    /* Align to the right */
+    margin-right: 10px;
+    /* Add some margin for spacing */
+}
+
+.footer {
+    position: relative;
+    list-style: none;
+    display: flex;
+    margin-top: 62%;
+    margin-bottom: 0;
+    padding-left: 42%;
+    text-align: center;
+    background-color: #bcbaba9b;
+    color: #232323;
+}
+
+.footer li {
+    padding-right: 0.8em;
+    cursor: pointer;
+}
+
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+.last {
+    display: flex;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    /* Center horizontally */
+    text-align: center;
+    height: 2em;
+    background-color: #232323;
+    font-family: 'Nunito Sans';
+    font-style: normal;
+    color: #F7F7F7;
+    width: 100%;
+}
+
+.last p {
+    margin: 0;
+    /* Remove default paragraph margins */
+}

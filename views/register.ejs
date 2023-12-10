@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/images/IITR_Logo.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&family=Open+Sans&display=swap" rel="stylesheet">
+    <title>
+        <%= conference_Name %>
+    </title>
+</head>
+
+<body>
+    <div class="background">
+        <img class="header-image" src="../images/logo_img.png" alt="">
+        <div class="welcome_text">
+            <p>WELCOME TO IIT ROORKEE CONFERENCE PORTAL</p>
+        </div>
+        <div class="header">
+            <p class="heading">Abstract Submission Page</p>
+            <p class="home">Already submitted? <a href="/"><b>Log in</b></a></p>
+        </div>
+        <div class="header2">
+            <p class="heading2">
+                <%= conference_Name %>
+            </p>
+        </div>
+        <div class="container">
+            <form action="" method="POST" class="login-email">
+                <div class="input-group">
+                    <p>Title of abstract: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="title" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Conference Themes: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="themes" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Name: <a class="req_field">(Required)</a></p>
+                    <input class="together" type="text" placeholder="Prefix" name="prefix" value="" required>
+                    <input class="together" type="text" placeholder="First Name" name="first_name" value="" required>
+                    <input class="together" type="text" placeholder="Last Name" name="last_name" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Designation: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="designation" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Institution: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="institution" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Email: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="username" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Password: <a class="req_field">(Required)</a></p>
+                    <input type="password" name="password" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Confirm Password: <a class="req_field">(Required)</a></p>
+                    <input type="password" name="con_password" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Phone: <a class="req_field">(Required)</a></p>
+                    <input type="tel" name="phone" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Gender: <a class="req_field">(Required)</a></p>
+                    <input class="radio" type="radio" name="gender" value="Male" required><a>Male</a>
+                    <input class="radio" type="radio" name="gender" value="Female" required><a>Female</a>
+                    <input class="radio" type="radio" name="gender" value="Other" required><a>Other</a>
+                    <input class="radio" type="radio" name="gender" value="Do not want to disclose" required><a>Do not
+                        want to disclose</a>
+                </div>
+                <div class="input-group">
+                    <p>Are you are Early Carrier Researcher? <a class="req_field">(Required)</a></p>
+                    <input class="radio" type="radio" name="researcher" value="Yes" required><a>Yes</a>
+                    <input class="radio" type="radio" name="researcher" value="No" required><a>No</a>
+                </div>
+                <div class="input-group">
+                    <p>Date of birth: <a class="req_field">(Required)</a></p>
+                    <input class="together" type="date" name="dob" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Postal Address: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="address" placeholder="Street Address" value="" required>
+                    <input class="together2" type="text" name="city" placeholder="City" value="" required>
+                    <input class="together2" type="text" name="state" placeholder="State/Province/Region" value=""
+                        required><br>
+                    <input class="together2" type="number" name="zip" placeholder="Zip Code" value="" required>
+                    <input class="together2" type="text" name="country" placeholder="Country" value="" required>
+                </div>
+                <div class="input-group">
+                    <p> Name of Presenter: <a class="req_field">(Required)</a></p>
+                    <input type="text" name="presenter" value="" required>
+                </div>
+                <div class="input-group">
+                    <p>Do you have Co-Author/s? <a class="req_field">(Required)</a></p>
+                    <input class="radio" type="radio" name="coauthor" value="Yes" required><a>Yes</a>
+                    <input class="radio" type="radio" name="coauthor" value="No" required><a>No</a>
+                </div>
+                <div class="input-group">
+                    <p>Abstract Submission File (Only pdf file) : <a class="req_field">(Required)</a></p>
+                    <button name="abstract" class="btn2">Choose File</button><a
+                        style="color: #4A4A4A; font-size: 11.5px;">No file chosen</a>
+                    <p style="color: #4A4A4A; font-size: 13px;">Accepted file types: pdf, Max. file size: 10 MB. </p>
+                </div>
+                <div class="input-group">
+                    <button name="submit" class="btn">SUBMIT</button>
+                </div>
+                <div class="">
+                    <button name="sample_download" class="footer">Sample Abstract Format Template</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="end">
+        <ul class="footer2">
+            <li>Sitemap </li>
+            <li>Privacy Policy </li>
+            <li>Accessibility </li>
+        </ul>
+        <div class="last">
+            <p>Copyright 2023,Institute Computer Centre,IIT Roorkee</p>
+        </div>
+</body>
+
+</html>

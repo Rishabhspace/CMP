@@ -1,0 +1,55 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/admin_dashboard.css">
+    <title>Admin Portal</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Admin Dashboard</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="section">
+                <div>
+                    <p class="sec_heading">Conference Section</p>
+                    <a href="/allconferences" class="tag"><button href="/allconferences" name="All conferences"
+                            class="btn">All
+                            Conferences</button>
+                    </a>
+                    <a href="/yourconferences" class="tag"><button name="Submitted application" class="btn">Your
+                            Conferences</button></a>
+                    <a href="/createconference" class="tag"> <button name="New conference" class="btn">Create new
+                            conference</button></a>
+                </div>
+
+                <hr size="2px" color="white" />
+                <div>
+                    <p class="sec_heading">Booking section Section</p>
+                    <a href="/vehicle" class="tag"><button name="Vehicle" class="btn">Vehicle Booking</button></a>
+                    <a href="/venue" class="tag"><button name="Venue" class="btn">Venue Booking</button></a>
+                    <a href="/guesthouse" class="tag"><button name="Guesthouse" class="btn">Guest house
+                            booking</button></a>
+                </div>
+
+                <hr size="2px" color="white" />
+                <div>
+                    <p class="sec_heading">Notification Section</p>
+                    <a href="" class="tag"><button name="Notifications" class="btn">Complete Details
+                            Notification</button></a>
+                    <a href="" class="tag"><button name="Fee" class="btn">Fee Collection Details</button></a>
+                </div>
+            </div>
+
+            <div class="support">
+                <button name="Support" class="btn2">Support</button>
+            </div>
+            <%- include("partials/footer")-%>
+    </body>
+
+    </html>

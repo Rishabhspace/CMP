@@ -1,0 +1,62 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <title>My Applications</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">My Applications</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>Conference Name</td>
+                    <td>Status</td>
+                    <td>Payment</td>
+                    <td>Guest House Booking</td>
+                    <td>Upload Documents</td>
+                    <td>Details</td>
+                </tr>
+                <% conferenceDetails.forEach(function(conferenceDetail){%>
+                    <tr class="entry">
+                        <td class="conference_name">
+                            <%= conferenceDetail.confTitle %>
+                        </td>
+                        <td>
+                            <button name="Status" class="<%= conferenceDetail.status %>">
+                                <%= conferenceDetail.status %>
+                            </button>
+                        </td>
+                        <td>
+                            <button name="Payment" class="<%= conferenceDetail.paymentButton %>">
+                                <%= conferenceDetail.payment %>
+                            </button>
+                        </td>
+                        <td>
+                            <a class="<%= conferenceDetail.guestHouseButton %>" href="">Book Guest House</a>
+                        </td>
+                        <td>
+                            <button name="Documents" class="btn-upload-document">Browse File</button>
+                            <a class="documents">No file selected</a>
+                        </td>
+                        <td>
+                            <a class="details"
+                                href="viewsubmitted/<%=conferenceDetail.name%>/<%= conferenceDetail.username %>"
+                                target="_blank">View
+                                Details</a>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+    </body>
+
+    </html>

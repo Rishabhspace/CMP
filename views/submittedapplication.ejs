@@ -1,0 +1,85 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="/css/sub_app.css">
+    <script src="/js/script.js"></script>
+    <title>Submitted Applications</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="/images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Submitted Applications for <%=conferenceName%>
+                </p>
+                <a href="/logout">
+                    <img class="logout" src="/images/logout.png" alt="">
+                    <img class="logout_text" src="/images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>Candidate Name</td>
+                    <td>Details</td>
+                    <td>Abstract</td>
+                    <td>Decision</td>
+                    <td>Uploaded Docs</td>
+
+                </tr>
+                <% submitted_Users.forEach(function(submitted_User){%>
+                    <tr class="entry">
+                        <td class="candidate_name">
+                            <%= submitted_User.prefix %>
+                                <%= submitted_User.first_name %>
+                                    <%= submitted_User.last_name %>
+                        </td>
+                        <td>
+                            <a class="date"
+                                href="/viewsubmitted/<%=conferenceShortName%>/<%= submitted_User.username %>"
+                                target="_blank">View</a>
+                        </td>
+                        <td>
+                            <a class="date" href="">View</a>
+                        </td>
+                        <td>
+                            <% if (submitted_User.status==='Waiting' ) { %>
+                                <form
+                                    action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Accepted"
+                                    method="POST" class="form1">
+                                    <button name="Accept" class="accept">Accept</button>
+                                </form>
+                                <form
+                                    action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Rejected"
+                                    method="POST" class="form1">
+                                    <p class="slash">/</p>
+                                    <button name="Reject" class="reject">Reject</button>
+                                </form>
+                                <% } else if (submitted_User.status==='Accepted' ) { %>
+                                    <p class="decision-accepted">Accepted</p>
+                                    <form
+                                        action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Waiting"
+                                        method="POST" class="form1">
+                                        <button name="Waiting" class="change">Change?</button>
+                                    </form>
+                                    <% } else if (submitted_User.status==='Rejected' ) { %>
+                                        <p class="decision-rejected">Rejected</p>
+                                        <form
+                                            action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Waiting"
+                                            method="POST" class="form1">
+                                            <button name="Waiting" class="change">Change?</button>
+                                        </form>
+                                        <% } %>
+                        </td>
+                        <td>
+                            <img class="docs" src="/images/upload_docs.png" alt="">
+                        </td>
+
+                    </tr>
+                    <% }) %>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

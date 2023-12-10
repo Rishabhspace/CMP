@@ -1,0 +1,55 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>Vehicle Booking</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Vehicle Booking</p>
+                <a href="admin_portal.html">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table1">
+                <thead class="titles">
+                    <td class="a">Available Vehicle</td>
+                    <td class="b">Status</td>
+
+
+                </thead>
+                <tbody class="entry">
+                    <td class="conference_name">Bus-102</td>
+
+                    <td class="date">
+                        <button name="edit" class="edit">BOOK NOW</button>
+                    </td>
+
+                </tbody>
+                <tbody class="entry">
+                    <td class="conference_name"> Bus-103</td>
+
+                    <td class="date">
+                        <button name="edit" class="edit2">Confirmed</button>
+                    </td>
+
+                </tbody>
+                <tbody class="entry">
+                    <td class="conference_name">Rickshaw</td>
+
+                    <td class="date">
+                        <button name="edit" class="edit3">Confirming</button>
+                    </td>
+
+                </tbody>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

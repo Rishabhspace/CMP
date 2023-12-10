@@ -1,0 +1,51 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>Guest House Booking</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading"><b>Admin Portal - </b>Guest House Booking</p>
+                <a href="admin_portal.html">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No.</td>
+                    <td>Guest Name</td>
+                    <td>Contact No.</td>
+                    <td>No. of rooms</td>
+                    <td>Date</td>
+                    <td>Booking</td>
+
+                </tr>
+                <tr class="entry">
+                    <td class="date1"> 01 </td>
+                    <td class="conference_name1" name="guestname">Rishabh Kumar</td>
+                    <td class="date1"> 9430325956 </td>
+                    <td>
+                        <a class="date1" name="noofroom">02</a>
+                    </td>
+                    <td>
+                        <a class="date1" href="">20-01-2023 to 23-01-2023</a>
+                    </td>
+
+                    <td>
+                        <a href="/book"> <button name="edit" class="edit">Book room</button></a>
+                    </td>
+
+
+                </tr>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

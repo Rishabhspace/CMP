@@ -1,0 +1,85 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="/css/style_new_conf.css">
+    <script src="/js/script.js"></script>
+    <title>Edit Conference</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="/images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Edit Conference</p>
+                <a href="/logout">
+                    <img class="logout" src="/images/logout.png" alt="">
+                    <img class="logout_text" src="/images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="form">
+                <form action="" method="POST" class="new_conf_form">
+                    <p class="info">Enter the conference's title .Title, acronym, and city should use English or any
+                        other
+                        language with the Latin alphabet, even if your conference uses Chinese, Russian, Arabic etc. as
+                        the
+                        main language.</p>
+                    <p class="para">Conference title:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="conf_title" value="<%= conference.conf_title %>"
+                            required>
+                    </div>
+                    <p class="heading2">Conference Information</p>
+                    <p class="info">Enter the conference Web page .If the conference has no Web page yet write 'none' in
+                        the
+                        corresponding field and add an explanation in 'Any other information' below</p>
+                    <p class="para">Web Page:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="web_page" value="<%= conference.web_page %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Venue:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="venue" value="<%= conference.venue %>" required>
+                    </div>
+                    <br>
+                    <p class="para">City:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="city" value="<%= conference.city %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Region:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="region" value="<%= conference.region %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Estimated number of submission:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="num_submission" value="<%= conference.num_submission %>"
+                            required>
+                    </div>
+                    <p class="date">Dates</p>
+                    <p class="para date2">First Day:</p>
+                    <div class="input-group">
+                        <input type="date" placeholder="" name="first_day" value="<%= firstDate %>" required>
+                    </div>
+                    <p class="para date2">Last Day:</p>
+                    <div class="input-group">
+                        <input type="date" placeholder="" name="last_day" value="<%= lastDate %>" required>
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <button name="CREATE" class="btn">Edit Conference</button>
+                    </div>
+                </form>
+                <form action="/delete/<%= conference.name %>" method="POST" class="delete-form">
+                    <button name="DELETE" class="btn-delete" onclick="return confirmDelete()">Delete
+                        Conference</button>
+                </form>
+            </div>
+            <%- include("partials/footer")-%>
+        </div>
+
+
+    </body>
+
+    </html>

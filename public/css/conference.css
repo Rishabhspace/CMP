@@ -1,0 +1,350 @@
+body {
+    margin: 0;
+}
+
+div {
+    display: block;
+}
+
+.background {
+    background: url('images/bg_img.svg');
+    width: 100%;
+    height: 93.5%;
+}
+
+.header-image {
+    position: absolute;
+    width: 500px;
+    height: 100px;
+    left: 50px;
+    top: 13.25px;
+}
+
+.logout {
+    position: absolute;
+    left: 96.12%;
+    right: 2.08%;
+    top: 12.83%;
+    bottom: 84.64%;
+}
+
+.logout_text {
+    position: absolute;
+    left: 95.6%;
+    right: 2.08%;
+    margin-top: -0.5%;
+}
+
+.heading {
+    font-size: 150%;
+    color: white;
+    margin: 0;
+    margin-top: 20px;
+    margin-left: 40px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header {
+    position: absolute;
+    width: 100%;
+    height: 72px;
+    top: 120px;
+    background: #4A7EAD;
+    box-shadow: 2px 2px 34.5962px 8.89616px rgba(0, 0, 0, 0.3);
+}
+
+.table {
+    position: absolute;
+    width: 97.5%;
+    height: 63px;
+    left: 1.5%;
+    top: 27.5%;
+    text-align: center;
+    font-size: x-large;
+    font-family: 'Poppins';
+    font-style: normal;
+    background: white;
+}
+
+.table1 {
+    position: absolute;
+    width: 97.5%;
+    height: 63px;
+    left: 1.5%;
+    top: 27.5%;
+    font-size: x-large;
+    font-family: 'Poppins';
+    font-style: normal;
+    background: white;
+}
+
+.entry {
+    background: #DCE6F0;
+    height: 2em;
+}
+
+.titles {
+    border-collapse: collapse;
+    color: #FFFFFF;
+    background: #4A7EAD;
+    height: 50px;
+}
+
+.a {
+    padding-left: 2em;
+    padding-right: 26em;
+}
+
+.b {
+    padding-left: 1.8em;
+}
+
+.c {
+    padding-left: 5em;
+}
+
+.c1 {
+    padding-left: 2.2em;
+}
+
+.conference_name {
+    color: #102E44;
+    font-size: large;
+    padding-left: 3em;
+}
+
+.conference_name1 {
+    color: #102E44;
+    font-size: large;
+}
+
+.date {
+    color: #000000;
+    font-size: large;
+    text-decoration-line: none;
+    cursor: auto;
+    padding-left: 1.6em;
+}
+
+.date1 {
+    color: #000000;
+    font-size: large;
+    text-decoration-line: none;
+    cursor: auto;
+}
+
+.edit {
+    width: 120px;
+    height: 32px;
+    background: #244862;
+    text-align: center;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: white;
+    font-size: medium;
+    border-right: 1px solid #677C90;
+    cursor: pointer;
+}
+
+.edit1 {
+    width: 70px;
+    height: 32px;
+    background: #244862;
+    text-align: center;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: white;
+    font-size: medium;
+    border-right: 1px solid #677C90;
+    cursor: pointer;
+}
+
+.edit2 {
+    width: 120px;
+    height: 32px;
+    border-radius: 9px;
+    color: #24B868;
+    font-size: medium;
+    border-color: #24B868;
+    border-right: 1px solid #24B868;
+    cursor: pointer;
+}
+
+.edit3 {
+    width: 120px;
+    height: 32px;
+    border-radius: 9px;
+    color: #D8821E;
+    border-right: 1px solid #D8821E;
+    cursor: pointer;
+    border-color: #D8821E;
+    font-size: medium;
+}
+
+.edit:hover {
+    cursor: pointer;
+}
+
+.application {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 27px;
+    align-items: center;
+    text-decoration-line: underline;
+    cursor: pointer;
+    color: #000000;
+}
+
+.footer {
+    position: relative;
+    list-style: none;
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 42%;
+    text-align: center;
+    background-color: #bcbaba9b;
+    color: #232323;
+}
+
+.footer li {
+    padding-right: 0.8em;
+    cursor: pointer;
+}
+
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+
+.last {
+    display: flex;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    /* Center horizontally */
+    text-align: center;
+    height: 2em;
+    background-color: #232323;
+    font-family: 'Nunito Sans';
+    font-style: normal;
+    color: #F7F7F7;
+    width: 100%;
+}
+
+.last p {
+    margin: 0;
+    /* Remove default paragraph margins */
+}
+
+.pop {
+    position: absolute;
+    width: 75%;
+    height: 90%;
+    left: 8em;
+    top: 3em;
+    background: #DCE6F0;
+    border-radius: 2px;
+}
+
+.cross {
+    width: 0.8em;
+    display: flex;
+    margin-left: 95%;
+    margin-top: 3%;
+    cursor: pointer;
+}
+
+.pop header {
+    position: absolute;
+    left: 2em;
+    top: 2em;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 36px;
+    color: #244862;
+}
+
+.pop form {
+    margin-left: 3em;
+    margin-top: 8em;
+}
+
+.pop form div {
+    margin-top: 1em;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    color: #244862;
+}
+
+.name {
+    box-sizing: border-box;
+    position: absolute;
+    width: 50em;
+    height: 2.5em;
+    left: 18em;
+    background: #F8F8F8;
+    border: #FFFFFF;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
+
+.pop span {
+    margin-left: 10em;
+}
+
+.No {
+    box-sizing: border-box;
+    position: absolute;
+    width: 25em;
+    height: 2.5em;
+    left: 18em;
+    background: #F8F8F8;
+    border: #FFFFFF;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
+
+.days {
+    box-sizing: border-box;
+    position: absolute;
+    width: 8.2em;
+    height: 2.5em;
+    background: #F8F8F8;
+    border: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    margin-left: 2em;
+    color: rgba(0, 0, 0, 0.25);
+    ;
+    text-transform: uppercase;
+}
+
+.confirm button {
+    background: #244862;
+    border: 0.5px solid #FFFFFF;
+    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    color: #F8F8F8;
+    width: 150px;
+    height: 36px;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 200;
+    font-size: 1em;
+    line-height: 33px;
+    cursor: pointer;
+    margin-left: 3em;
+    margin-top: 3em;
+}
+
+footer p {
+    margin: 0;
+    /* Remove default paragraph margins */
+}

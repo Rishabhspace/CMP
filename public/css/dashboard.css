@@ -1,0 +1,223 @@
+body {
+    margin: 0;
+}
+
+div {
+    display: block;
+}
+
+.background {
+    background: url('images/bg_img.svg');
+    width: 100%;
+    height: 93.5%;
+}
+
+.header-image {
+    position: absolute;
+    width: 500px;
+    height: 100px;
+    left: 50px;
+    top: 13.25px;
+}
+
+.logout {
+    position: absolute;
+    left: 96.12%;
+    right: 2.08%;
+    top: 12.83%;
+    bottom: 84.64%;
+}
+
+.logout_text {
+    position: absolute;
+    left: 95.6%;
+    right: 2.08%;
+    margin-top: -0.5%;
+}
+
+.heading {
+    font-size: 150%;
+    color: white;
+    margin: 0;
+    margin-top: 20px;
+    margin-left: 40px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header {
+    position: absolute;
+    width: 100%;
+    height: 72px;
+    top: 120px;
+    background: #4A7EAD;
+    box-shadow: 2px 2px 34.5962px 8.89616px rgba(0, 0, 0, 0.3);
+}
+
+.table {
+    position: absolute;
+    width: 95%;
+    height: 63px;
+    left: 30px;
+    top: 235px;
+    /* background: #DCE6F0; */
+    border-radius: 2px;
+    font-size: x-large;
+    text-align: center;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    border: none;
+}
+
+.titles {
+    color: #FFFFFF;
+    background: #4A7EAD;
+    height: 50px;
+    margin-top: 10px;
+}
+
+.conference_name {
+    color: #102E44;
+    font-size: large;
+}
+
+.guest_house {
+    color: #000000;
+    font-size: large;
+}
+
+.guest_house1 {
+    color: #239021;
+    font-size: large;
+}
+
+.guest_house2 {
+    color: #9FA8AF;
+    text-decoration: none;
+    font-size: large;
+}
+
+.details {
+    color: #102E44;
+    font-size: medium;
+}
+
+
+.btn-upload-document {
+    background: #244862;
+    border-radius: 4px;
+    color: #F8F8F8;
+    width: 90px;
+    height: 21.08px;
+}
+
+.documents {
+    color: rgba(0, 0, 0, 0.25);
+    font-size: 12px;
+    background-color: white;
+}
+
+.footer {
+    position: relative;
+    list-style: none;
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 42%;
+    text-align: center;
+    background-color: #bcbaba9b;
+    color: #232323;
+}
+
+.footer li {
+    padding-right: 0.8em;
+    cursor: pointer;
+}
+
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+
+.last {
+    display: flex;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    /* Center horizontally */
+    text-align: center;
+    height: 2em;
+    background-color: #232323;
+    font-family: 'Nunito Sans';
+    font-style: normal;
+    color: #F7F7F7;
+    width: 100%;
+}
+
+.last p {
+    margin: 0;
+    /* Remove default paragraph margins */
+}
+
+.entry {
+    background: #DCE6F0;
+    height: 2em;
+}
+
+/* Changing Button name according to status and payment mode name */
+.Accepted {
+    width: 110px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #24B868;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: #138949;
+    font-size: medium;
+}
+
+.Waiting {
+    width: 110px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #D7BB2D;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: #D8821E;
+    font-size: medium;
+}
+
+.Rejected {
+    width: 110px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #B82424;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: #B82424;
+    font-size: medium;
+}
+
+.Pay-Now-Payment {
+    width: 110px;
+    height: 32px;
+    background: #244862;
+    border: none;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: #FFFFFF;
+    font-size: medium;
+}
+
+
+.Not-Pay-Now {
+    width: 110px;
+    height: 32px;
+    background: #9FA8AF;
+    border: none;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 9px;
+    color: #FFFFFF;
+    font-size: medium;
+}

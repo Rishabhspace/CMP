@@ -1,0 +1,34 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Login Page</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Conference Management Account Login</p>
+            </div>
+
+
+            <div class="container">
+                <p class="form_heading">ACCOUNT LOGIN</p>
+                <form action="/admin" method="POST" class="login-email">
+                    <div class="input-group">
+                        <input type="text" placeholder="EMAIL ID" name="email" value="" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" placeholder="PASSWORD" name="password" value="" required>
+                    </div>
+                    <div class="input-group">
+                        <button name="LOG IN" class="btn">LOG IN</button>
+                    </div>
+                    <p class="login-register-text">Don't have an account? <a href="/signup">Register here</a>.</p>
+                </form>
+            </div>
+        </div>
+        <%- include("partials/footer")-%>
+    </body>
+
+    </html>
