@@ -242,3 +242,9 @@ li {
     margin: 0;
     /* Remove default paragraph margins */
 }
+
+.file_name {
+    color: #102E44;
+    font-size: medium;
+    margin-right: 7px;
+}

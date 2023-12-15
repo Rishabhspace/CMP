@@ -43,8 +43,17 @@
                             <a class="<%= conferenceDetail.guestHouseButton %>" href="">Book Guest House</a>
                         </td>
                         <td>
-                            <button name="Documents" class="btn-upload-document">Browse File</button>
-                            <a class="documents">No file selected</a>
+
+                            <form action="/dashboard/<%= conferenceDetail.name %>" method="post"
+                                enctype="multipart/form-data">
+                                <input type="file" name="userUploadFile" id="userUploadFile" class="upload-button">
+                                <button type="submit" name="submit" class="btn-upload-document">Upload</button>
+                            </form>
+                            <% for (let i=0; i < conferenceDetail.fileLocation.length; i++) { %>
+                                <a href="/<%= conferenceDetail.fileLocation[i] %>" class="file_name">
+                                    Document-<%= i + 1 %>
+                                </a>
+                                <% } %>
                         </td>
                         <td>
                             <a class="details"

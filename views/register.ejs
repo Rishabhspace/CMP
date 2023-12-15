@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato&family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="/js/script.js"></script>
     <title>
         <%= conference_Name %>
     </title>
@@ -31,7 +32,8 @@
             </p>
         </div>
         <div class="container">
-            <form action="" method="POST" class="login-email">
+            <form action="/register/<%= conference_ShortName %>" method="POST" class="login-email"
+                enctype="multipart/form-data" onsubmit="return validateForm()">
                 <div class="input-group">
                     <p>Title of abstract: <a class="req_field">(Required)</a></p>
                     <input type="text" name="title" value="" required>
@@ -60,11 +62,11 @@
                 </div>
                 <div class="input-group">
                     <p>Password: <a class="req_field">(Required)</a></p>
-                    <input type="password" name="password" value="" required>
+                    <input type="password" name="password" id="password" value="" required>
                 </div>
                 <div class="input-group">
                     <p>Confirm Password: <a class="req_field">(Required)</a></p>
-                    <input type="password" name="con_password" value="" required>
+                    <input type="password" name="con_password" id="confirmPassword" value="" required>
                 </div>
                 <div class="input-group">
                     <p>Phone: <a class="req_field">(Required)</a></p>
@@ -107,17 +109,16 @@
                 </div>
                 <div class="input-group">
                     <p>Abstract Submission File (Only pdf file) : <a class="req_field">(Required)</a></p>
-                    <button name="abstract" class="btn2">Choose File</button><a
-                        style="color: #4A4A4A; font-size: 11.5px;">No file chosen</a>
+                    <input type="file" name="myFile" id="myFile">
                     <p style="color: #4A4A4A; font-size: 13px;">Accepted file types: pdf, Max. file size: 10 MB. </p>
                 </div>
                 <div class="input-group">
-                    <button name="submit" class="btn">SUBMIT</button>
-                </div>
-                <div class="">
-                    <button name="sample_download" class="footer">Sample Abstract Format Template</button>
+                    <button type="submit" name="submit" class="btn">SUBMIT</button>
                 </div>
             </form>
+            <div class="">
+                <button name="sample_download" class="footer">Sample Abstract Format Template</button>
+            </div>
         </div>
     </div>
     <div class="end">
@@ -129,6 +130,43 @@
         <div class="last">
             <p>Copyright 2023,Institute Computer Centre,IIT Roorkee</p>
         </div>
+
+        <script>
+            function validateForm() {
+                var fileInput = document.getElementById('myFile');
+                var file = fileInput.files[0];
+
+                var password = document.getElementById('password').value;
+                var confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (password !== confirmPassword) {
+                    alert('Password and Confirm Password are not the same');
+                    return false;
+                }
+
+                // Check if a file is selected
+                if (!file) {
+                    alert('Please upload your abstract');
+                    return false;
+                }
+
+                // Check file type
+                if (file.type !== 'application/pdf') {
+                    alert('Invalid file type: Please choose a PDF file.');
+                    return false;
+                }
+
+                // Check file size (in bytes)
+                var maxSize = 10 * 1024 * 1024; // 10 MB
+                if (file.size > maxSize) {
+                    alert('File size exceeds. Please choose file smaller than 10 MB');
+                    return false;
+                }
+
+                return true; // Form will be submitted if validation passes
+            }
+        </script>
+
 </body>
 
 </html>

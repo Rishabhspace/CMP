@@ -39,7 +39,7 @@
                                 target="_blank">View</a>
                         </td>
                         <td>
-                            <a class="date" href="">View</a>
+                            <a class="date" href="/<%= submitted_User.abstractFileLocation %>" target="_blank">View</a>
                         </td>
                         <td>
                             <% if (submitted_User.status==='Waiting' ) { %>
@@ -71,7 +71,16 @@
                                         <% } %>
                         </td>
                         <td>
-                            <img class="docs" src="/images/upload_docs.png" alt="">
+                            <% if(submitted_User.uploadedDocLocation.length===0){%>
+
+                                <img class="docs" src="/images/upload_docs.png" alt="">
+                                <%}%>
+
+                                    <% for (let i=0; i < submitted_User.uploadedDocLocation.length; i++) { %>
+                                        <a href="/<%= submitted_User.uploadedDocLocation[i] %>" class="file_name">
+                                            Document-<%= i + 1 %>
+                                        </a>
+                                        <% } %>
                         </td>
 
                     </tr>

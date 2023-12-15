@@ -31,3 +31,26 @@ function updateStatus(newStatus) {
     },
   });
 }
+
+function validateForm() {
+  var fileInput = document.getElementById("myFile");
+  var allowedTypes = ["application/pdf"];
+  var maxFileSize = 10 * 1024 * 1024; // 10 MB
+
+  if (fileInput.files.length > 0) {
+    var fileType = fileInput.files[0].type;
+    var fileSize = fileInput.files[0].size;
+
+    if (allowedTypes.indexOf(fileType) === -1) {
+      alert("Please select a PDF file.");
+      return false;
+    }
+
+    if (fileSize > maxFileSize) {
+      alert("File size exceeds the maximum limit of 10 MB.");
+      return false;
+    }
+  }
+
+  return true; // Continue with form submission
+}

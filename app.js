@@ -12,10 +12,14 @@ const findOrCreate = require("mongoose-findorcreate");
 const _ = require("lodash");
 const { format } = require("date-fns");
 const PDFDocument = require("./pdfkit-tables");
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 
 app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
+app.use("/abstracts", express.static("abstracts"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -65,6 +69,8 @@ const userSchema = new mongoose.Schema({
   country: String,
   presenter: String,
   coauthor: String,
+  abstractFileLocation: String,
+  uploadedDocLocation: [String],
   conference_name: [String],
   status: String,
   payment: String,
@@ -92,6 +98,47 @@ passport.deserializeUser(function (user, cb) {
     return cb(null, user);
   });
 });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "abstracts/");
+  },
+  filename: function (req, file, cb) {
+    const FileName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const Extension = path.extname(file.originalname);
+    cb(null, FileName + Extension);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  // Check file type, allow only PDF
+  if (file.mimetype === "application/pdf") {
+    cb(null, true);
+  } else {
+    cb(new Error("Only PDF files are allowed"), false);
+  }
+};
+
+const storageUserDoc = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // console.log(req);
+    const fileUploadLocation = "uploads/";
+    cb(null, fileUploadLocation);
+  },
+  filename: function (req, file, cb) {
+    const FileName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const Extension = path.extname(file.originalname);
+    cb(null, FileName + Extension);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB file size limit
+});
+
+const uploadDocument = multer({ storage: storageUserDoc });
 
 const conferenceSchema = {
   conf_title: String,
@@ -168,6 +215,7 @@ app.get("/dashboard", function (req, res) {
             username: userInConference.username,
             paymentButton: paymentButtonColor,
             guestHouseButton: guestHouseBookingTextColor,
+            fileLocation: userInConference.uploadedDocLocation,
           };
           conferenceDetails.push(userDetailsInConference);
         }
@@ -210,6 +258,7 @@ app.get("/register/:conferenceName", function (req, res) {
         //Show existing Conference List
         res.render("register", {
           conference_Name: displayName,
+          conference_ShortName: conferenceName,
         });
       } else {
         res.redirect("/");
@@ -554,99 +603,118 @@ app.post("/signup", function (req, res) {
   );
 });
 
-app.post("/register/:conferenceName", async function (req, res) {
-  const conference_name = req.params.conferenceName;
-
-  try {
-    // Create a new user
-    const newUser = new User({
-      username: req.body.username,
-      title: req.body.title,
-      themes: req.body.themes,
-      prefix: req.body.prefix,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      designation: req.body.designation,
-      institution: req.body.institution,
-      phone: req.body.phone,
-      gender: req.body.gender,
-      researcher: req.body.researcher,
-      dob: req.body.dob,
-      address: req.body.address,
-      city: req.body.city,
-      state: req.body.state,
-      zip: req.body.zip,
-      country: req.body.country,
-      presenter: req.body.presenter,
-      coauthor: req.body.coauthor,
-      status: "Waiting",
-      payment: "Pay Now",
-      role: "user",
-    });
-
-    const newUser_loginDetails = new User({
-      role: "user",
-      username: req.body.username,
-      prefix: req.body.prefix,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      conference_name: [conference_name],
-    });
-
-    // Check if the username is already registered
-    const existingUser = await User.findOne({ username: req.body.username });
-    if (existingUser) {
-      // Check if the user is already registered for the specified conference
-      const isUserRegistered =
-        existingUser.conference_name.includes(conference_name);
-
-      if (isUserRegistered) {
-        // Handle the case where the user is already registered for this conference
-        return res
-          .status(400)
-          .send("You are already registered for this conference.");
-      }
-      // Add the conference name to the user's registered conferences
-      existingUser.conference_name.push(conference_name);
-
-      // Save the updated user document
-      await existingUser.save();
-      const conference = await Conference.findOne({ name: conference_name });
-      conference.users.push(newUser);
-      await conference.save();
-      passport.authenticate("local")(req, res, function () {
-        res.redirect("/dashboard");
+app.post(
+  "/register/:conferenceName",
+  upload.single("myFile"),
+  async function (req, res, next) {
+    const conference_name = req.params.conferenceName;
+    // console.log(req.file);
+    try {
+      // Create a new user
+      const newUser = new User({
+        username: req.body.username,
+        title: req.body.title,
+        themes: req.body.themes,
+        prefix: req.body.prefix,
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        designation: req.body.designation,
+        institution: req.body.institution,
+        phone: req.body.phone,
+        gender: req.body.gender,
+        researcher: req.body.researcher,
+        dob: req.body.dob,
+        address: req.body.address,
+        city: req.body.city,
+        state: req.body.state,
+        zip: req.body.zip,
+        country: req.body.country,
+        presenter: req.body.presenter,
+        coauthor: req.body.coauthor,
+        abstractFileLocation: req.file.path,
+        status: "Waiting",
+        payment: "Pay Now",
+        role: "user",
       });
-    } else if (!existingUser) {
-      // Save the user to the database
-      await User.register(newUser_loginDetails, req.body.password);
 
-      // Find the conference by name
-      const conference = await Conference.findOne({ name: conference_name });
+      const newUser_loginDetails = new User({
+        role: "user",
+        username: req.body.username,
+        prefix: req.body.prefix,
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        conference_name: [conference_name],
+      });
 
-      // If the conference exists
-      if (conference) {
-        // Add the user to the conference's users array
+      // Check if the username is already registered
+      const existingUser = await User.findOne({ username: req.body.username });
+      if (existingUser) {
+        // Check if the user is already registered for the specified conference
+        const isUserRegistered =
+          existingUser.conference_name.includes(conference_name);
+
+        if (isUserRegistered) {
+          // Handle the case where the user is already registered for this conference
+          return res
+            .status(400)
+            .send("You are already registered for this conference.");
+        }
+        // Add the conference name to the user's registered conferences
+        existingUser.conference_name.push(conference_name);
+
+        // Save the updated user document
+        await existingUser.save();
+        const conference = await Conference.findOne({ name: conference_name });
         conference.users.push(newUser);
-
-        // Save the updated conference
         await conference.save();
-
-        // Redirect to the dashboard or another appropriate route
         passport.authenticate("local")(req, res, function () {
           res.redirect("/dashboard");
         });
-      } else {
-        // Handle the case where the conference does not exist
-        res.status(404).send("Conference not found");
+      } else if (!existingUser) {
+        // Save the user to the database
+        await User.register(newUser_loginDetails, req.body.password);
+
+        // Find the conference by name
+        const conference = await Conference.findOne({ name: conference_name });
+
+        // If the conference exists
+        if (conference) {
+          // Add the user to the conference's users array
+          conference.users.push(newUser);
+
+          // Save the updated conference
+          await conference.save();
+
+          // Redirect to the dashboard or another appropriate route
+          passport.authenticate("local")(req, res, function () {
+            res.redirect("/dashboard");
+          });
+        } else {
+          // Handle the case where the conference does not exist
+          res.status(404).send("Conference not found");
+        }
       }
+    } catch (err) {
+      // Handle any errors that occur during the registration process
+      console.error(err);
+      res.status(500).send("Internal Server Error");
     }
-  } catch (err) {
-    // Handle any errors that occur during the registration process
-    console.error(err);
-    res.status(500).send("Internal Server Error");
   }
-});
+);
+
+app.post(
+  "/dashboard/:conferenceName",
+  uploadDocument.single("userUploadFile"),
+  async function (req, res) {
+    const userEmail = req.user.username;
+    const conference_name = req.params.conferenceName;
+    const conference = await Conference.findOne({ name: conference_name });
+    const user = conference.users.find((user) => user.username === userEmail);
+    user.uploadedDocLocation.push(req.file.path);
+    await conference.save();
+    res.redirect("/dashboard");
+  }
+);
 
 //Generating user details pdf
 app.get(
