@@ -155,8 +155,16 @@ const conferenceSchema = {
 };
 const Conference = mongoose.model("Conference", conferenceSchema);
 
-app.get("/", function (req, res) {
-  res.render("home");
+app.get("/", async function (req, res) {
+  if (req.isAuthenticated()) {
+    const userName = req.user.username;
+    const user = await User.findOne({ username: userName });
+    if (user.role === "admin") {
+      res.redirect("/admindashboard");
+    } else if (user.role === "user") {
+      res.redirect("/dashboard");
+    }
+  } else res.render("home");
 });
 
 app.get("/login", function (req, res) {
@@ -306,7 +314,7 @@ async function isAdmin(req, res, next) {
     res.redirect("/");
   }
 }
-//Just Checking the isExcatAdmin
+//Just Checking the isExactAdmin
 function exactAdmin(conferenceName) {
   return async function isExactAdmin(req, res, next) {
     if (req.isAuthenticated()) {
@@ -424,7 +432,16 @@ app.get("/edit/:name", isAdmin, async (req, res) => {
     const conference = await Conference.findOne({ name: req.params.name });
     const firstDate = format(conference.first_day, "yyyy-MM-dd");
     const lastDate = format(conference.last_day, "yyyy-MM-dd");
-    res.render("editconference", { conference, firstDate, lastDate });
+    const reqUser = req.user.username;
+    const confCreator = conference.created_by.username;
+    const userRole = conference.created_by.role;
+    if (conference && userRole === "admin" && confCreator === reqUser) {
+      // User found and has admin role and is the creator of that conference
+      res.render("editconference", { conference, firstDate, lastDate });
+    } else {
+      // User not found or doesn't have admin role or is not the creator of that conference
+      res.redirect("/");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -728,75 +745,91 @@ app.get(
         name: conferenceName,
       });
 
-      // Find the user in the array
-      const User = findConference.users.find(
-        (user) => user.username === userName
-      );
-      // console.log(User);
-      function formatDate(dateString) {
-        const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-        const formattedDate = new Date(dateString).toLocaleDateString(
-          "en-GB",
-          options
+      const conference = await Conference.findOne({ name: conferenceName });
+      const reqUser = req.user.username;
+      const confCreator = conference.created_by.username;
+      //This pdf can only be accessed by User whose information is this and admin who created this conference.
+      if (reqUser === userName || reqUser === confCreator) {
+        // Find the user in the array
+        const User = findConference.users.find(
+          (user) => user.username === userName
         );
-        return formattedDate.split("/").join("-");
+        // console.log(User);
+        function formatDate(dateString) {
+          const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+          const formattedDate = new Date(dateString).toLocaleDateString(
+            "en-GB",
+            options
+          );
+          return formattedDate.split("/").join("-");
+        }
+        // Create a PDF document
+        const doc = new PDFDocument();
+
+        // Set response headers
+        res.setHeader(
+          "Content-disposition",
+          `inline; filename=${conferenceName + "_" + User.first_name + ".pdf"}`
+        );
+        res.setHeader("Content-type", "application/pdf");
+
+        // Pipe the PDF content to the response
+        doc.pipe(res);
+        // Add content to the PDF
+        const myFont = "public/fonts/Poppins-SemiBold.ttf";
+        doc
+          .image("public/images/logo_img.png", 30, 30, { width: 300 })
+          .moveTo(30, 100) // Adjust the Y-coordinate as needed
+          .lineTo(580, 100) // Adjust the X-coordinate as needed
+          .lineWidth(1.5)
+          .stroke();
+        doc
+          .font(myFont)
+          .fontSize(20)
+          .text(
+            "Abstract Submission of " + findConference.conf_title,
+            30,
+            110,
+            {
+              align: "left",
+            }
+          )
+          .moveDown();
+
+        // Add user details to the PDF
+        const tableOptions = {
+          headers: ["Application Details", ""],
+          rows: [
+            ["Title:", User.title],
+            ["Name:", `${User.prefix} ${User.first_name} ${User.last_name}`],
+            ["Designation:", User.designation],
+            ["Institution:", User.institution],
+            ["Phone:", User.phone],
+            ["Gender:", User.gender],
+            ["Researcher:", User.researcher],
+            ["Date of Birth:", formatDate(User.dob)],
+            ["Address:", User.address],
+            ["City:", User.city],
+            ["State:", User.state],
+            ["ZIP:", User.zip],
+            ["Country:", User.country],
+            ["Presenter:", User.presenter],
+            ["Coauthor:", User.coauthor],
+            ["Status:", User.status],
+            ["Payment:", User.payment],
+          ],
+        };
+
+        // Draw the table with light background color
+        doc.table(tableOptions, 30, 165, {
+          width: 550,
+          fillColor: "lightgray",
+        });
+
+        doc.end();
+      } else {
+        res.redirect("/");
       }
-      // Create a PDF document
-      const doc = new PDFDocument();
-
-      // Set response headers
-      res.setHeader(
-        "Content-disposition",
-        `inline; filename=${conferenceName + "_" + User.first_name + ".pdf"}`
-      );
-      res.setHeader("Content-type", "application/pdf");
-
-      // Pipe the PDF content to the response
-      doc.pipe(res);
-      // Add content to the PDF
-      const myFont = "public/fonts/Poppins-SemiBold.ttf";
-      doc
-        .image("public/images/logo_img.png", 30, 30, { width: 300 })
-        .moveTo(30, 100) // Adjust the Y-coordinate as needed
-        .lineTo(580, 100) // Adjust the X-coordinate as needed
-        .lineWidth(1.5)
-        .stroke();
-      doc
-        .font(myFont)
-        .fontSize(20)
-        .text("Abstract Submission of " + findConference.conf_title, 30, 110, {
-          align: "left",
-        })
-        .moveDown();
-
-      // Add user details to the PDF
-      const tableOptions = {
-        headers: ["Application Details", ""],
-        rows: [
-          ["Title:", User.title],
-          ["Name:", `${User.prefix} ${User.first_name} ${User.last_name}`],
-          ["Designation:", User.designation],
-          ["Institution:", User.institution],
-          ["Phone:", User.phone],
-          ["Gender:", User.gender],
-          ["Researcher:", User.researcher],
-          ["Date of Birth:", formatDate(User.dob)],
-          ["Address:", User.address],
-          ["City:", User.city],
-          ["State:", User.state],
-          ["ZIP:", User.zip],
-          ["Country:", User.country],
-          ["Presenter:", User.presenter],
-          ["Coauthor:", User.coauthor],
-          ["Status:", User.status],
-          ["Payment:", User.payment],
-        ],
-      };
-
-      // Draw the table with light background color
-      doc.table(tableOptions, 30, 165, { width: 550, fillColor: "lightgray" });
-
-      doc.end();
     } catch (error) {
       console.error("Error generating PDF:", error);
       res.status(500).send("Internal Server Error");
@@ -810,5 +843,5 @@ if ((port == null) | (port == "")) {
 }
 
 app.listen(port, function () {
-  console.log("Server started on port 3000.");
+  console.log("Server started on port " + port);
 });
