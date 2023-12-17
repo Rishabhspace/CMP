@@ -564,6 +564,7 @@ app.post("/edit/:name", async (req, res) => {
       city: req.body.city,
       region: req.body.region,
       num_submission: req.body.num_submission,
+      fee: req.body.fee_amount,
       first_day: req.body.first_day,
       last_day: req.body.last_day,
     });
