@@ -1,5 +1,6 @@
 //jshint esversion:6
 require("dotenv").config();
+const { request, response } = require("express");
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -14,6 +15,10 @@ const { format } = require("date-fns");
 const PDFDocument = require("./pdfkit-tables");
 const multer = require("multer");
 const path = require("path");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+const fs = require("fs");
+const pdfTable = require("pdfkit-table");
 
 const app = express();
 
@@ -74,6 +79,12 @@ const userSchema = new mongoose.Schema({
   conference_name: [String],
   status: String,
   payment: String,
+  amountCurrency: String,
+  amountPaid: Number,
+  paymentId: String,
+  paymentTime: Date,
+  orderId: String,
+  orderSignature: String,
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -150,6 +161,8 @@ const conferenceSchema = {
   num_submission: Number,
   first_day: Date,
   last_day: Date,
+  fee: Number,
+  feeCurrency: String,
   created_by: userSchema,
   users: [userSchema],
 };
@@ -221,9 +234,18 @@ app.get("/dashboard", function (req, res) {
             payment: userInConference.payment,
             name: conference.name,
             username: userInConference.username,
+            nameOfUser:
+              userInConference.prefix +
+              " " +
+              userInConference.first_name +
+              " " +
+              userInConference.last_name,
+            email: userInConference.username,
+            phone: userInConference.phone,
             paymentButton: paymentButtonColor,
             guestHouseButton: guestHouseBookingTextColor,
             fileLocation: userInConference.uploadedDocLocation,
+            razorpayKey: process.env.RAZORPAY_ID_KEY,
           };
           conferenceDetails.push(userDetailsInConference);
         }
@@ -357,8 +379,25 @@ app.get("/allconferences", function (req, res) {
   find();
   async function find() {
     try {
-      const conference = await Conference.find({});
+      const conference = await Conference.find({}).sort({ first_day: 1 });
       res.render("allconferences", {
+        conferences: conference,
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+});
+
+app.get("/upcoming-conferences", function (req, res) {
+  find();
+  async function find() {
+    try {
+      const today = new Date();
+      const conference = await Conference.find({
+        first_day: { $gte: today },
+      }).sort({ first_day: 1 });
+      res.render("upcomingconferences", {
         conferences: conference,
       });
     } catch (e) {
@@ -491,6 +530,8 @@ app.post("/createconference", async function (req, res) {
       city: req.body.city,
       region: req.body.region,
       num_submission: req.body.num_submission,
+      fee: req.body.fee_amount,
+      feeCurrency: "INR",
       first_day: req.body.first_day,
       last_day: req.body.last_day,
       created_by: conf_creator,
@@ -836,6 +877,168 @@ app.get(
     }
   }
 );
+
+app.get("/checkpayment", async function (req, res) {
+  res.render("payment");
+});
+
+//Razorpay Payments
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_ID_KEY,
+  key_secret: process.env.RAZORPAY_SECRET_KEY,
+});
+
+app.post("/create-order/:conferenceName", async (req, res) => {
+  const conferenceName = req.params.conferenceName;
+  const conference = await Conference.findOne({
+    name: conferenceName,
+  });
+
+  const amount = conference.fee * 100; // Amount in paise (e.g., 50000 paise = ₹500)
+  const currency = conference.feeCurrency;
+
+  const options = {
+    amount,
+    currency,
+  };
+
+  try {
+    const order = await razorpay.orders.create(options);
+    res.json(order);
+    // console.log(order);
+  } catch (error) {
+    res.status(500).json({ error: "Error creating order" });
+  }
+});
+
+app.post("/capture-payment/:conferenceName/:userName", async (req, res) => {
+  const { paymentId, amount, orderId, orderSignature, currency } = req.body;
+  const conferenceName = req.params.conferenceName;
+  const userName = req.params.userName;
+  // console.log(orderSignature);
+  try {
+    const generated_signature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
+      .update(orderId + "|" + paymentId)
+      .digest("hex");
+    // console.log(generated_signature);
+    if (generated_signature === orderSignature) {
+      await Conference.updateOne(
+        { name: conferenceName, "users.username": userName },
+        {
+          $set: {
+            "users.$.payment": "Paid",
+            "users.$.amountCurrency": currency,
+            "users.$.amountPaid": amount / 100,
+            "users.$.paymentId": paymentId,
+            "users.$.orderId": orderId,
+            "users.$.orderSignature": orderSignature,
+            "users.$.orderSignature": orderSignature,
+            "users.$.paymentTime": new Date(),
+          },
+        }
+      );
+      res.json({ Status: "Payment Successful & Verified" });
+    } else {
+      res.json({ Status: "Payment not Verified" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error capturing payment" });
+  }
+});
+//Payment PDF Report
+
+app.get("/Payment-Report/:conferenceName", isAdmin, async (req, res) => {
+  const conferenceName = req.params.conferenceName;
+  const conference = await Conference.findOne({
+    name: conferenceName,
+  });
+  const reqUser = req.user.username;
+  const confCreator = conference.created_by.username;
+  const paidUsers = conference.users.filter((user) => user.payment === "Paid");
+  if (reqUser === confCreator) {
+    function formatDateTime(dateString) {
+      const options = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, // Use 24-hour format
+      };
+
+      const formattedDateTime = new Date(dateString).toLocaleString(
+        "en-GB",
+        options
+      );
+      return formattedDateTime.replace(/[/,]/g, "-"); // Replace slashes with dashes
+    }
+    // Create a PDF document in landscape orientation
+    let doc = new pdfTable({
+      margin: { top: 30, right: 30, bottom: 30, left: 30 },
+      layout: "landscape",
+      size: "A4",
+    });
+
+    // Pipe the PDF directly to the response
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-disposition",
+      `inline; filename=${conferenceName + "_Payment.pdf"}`
+    );
+
+    doc.font("Helvetica-Bold").fontSize(18); // Set font to bold and increase font size for the title
+
+    // Center-align the title
+    const titleWidth = doc.widthOfString(
+      "Payment Details of " + conference.conf_title
+    );
+    const titleX = (doc.page.width - titleWidth) / 2;
+    doc.text("Payment Details of " + conference.conf_title, titleX, 30);
+
+    // Reset font for table headers and rows
+    doc.font("Helvetica").fontSize(10);
+
+    // Table content
+
+    const tableArray = {
+      headers: [
+        " S.No.",
+        " Name",
+        " Email",
+        " Order ID ",
+        " Payment ID",
+        " Amount",
+        " Payment Date",
+      ],
+      rows: paidUsers.map((user, index) => [
+        index + 1,
+        user.prefix + " " + user.first_name + " " + user.last_name,
+        user.username,
+        user.orderId,
+        user.paymentId,
+        user.amountPaid + " " + user.amountCurrency,
+        formatDateTime(user.paymentTime) + " Hrs",
+      ]),
+    };
+
+    // Add a table to the PDF
+    doc.table(tableArray, {
+      width: 780, // Adjust the width according to your requirements
+      x: 30,
+      y: 60,
+      prepareRow: (row, indexColumn, indexRow, rectRow) => {
+        indexColumn === 0 &&
+          doc.addBackground(rectRow, indexRow % 2 ? "#D3D3D3" : "white", 0.5);
+      },
+    });
+
+    doc.pipe(res);
+    doc.end();
+  } else {
+    res.redirect("/");
+  }
+});
 
 let port = process.env.PORT;
 if ((port == null) | (port == "")) {

@@ -248,3 +248,8 @@ li {
     font-size: medium;
     margin-right: 7px;
 }
+
+.serial_number {
+    color: #102E44;
+    font-size: large;
+}

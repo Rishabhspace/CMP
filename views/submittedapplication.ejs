@@ -19,72 +19,86 @@
 
             <table class="table">
                 <tr class="titles">
+                    <td>S.No.</td>
                     <td>Candidate Name</td>
                     <td>Details</td>
                     <td>Abstract</td>
                     <td>Decision</td>
+                    <td>Fees</td>
                     <td>Uploaded Docs</td>
 
                 </tr>
-                <% submitted_Users.forEach(function(submitted_User){%>
-                    <tr class="entry">
-                        <td class="candidate_name">
-                            <%= submitted_User.prefix %>
-                                <%= submitted_User.first_name %>
-                                    <%= submitted_User.last_name %>
-                        </td>
-                        <td>
-                            <a class="date"
-                                href="/viewsubmitted/<%=conferenceShortName%>/<%= submitted_User.username %>"
-                                target="_blank">View</a>
-                        </td>
-                        <td>
-                            <a class="date" href="/<%= submitted_User.abstractFileLocation %>" target="_blank">View</a>
-                        </td>
-                        <td>
-                            <% if (submitted_User.status==='Waiting' ) { %>
-                                <form
-                                    action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Accepted"
-                                    method="POST" class="form1">
-                                    <button name="Accept" class="accept">Accept</button>
-                                </form>
-                                <form
-                                    action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Rejected"
-                                    method="POST" class="form1">
-                                    <p class="slash">/</p>
-                                    <button name="Reject" class="reject">Reject</button>
-                                </form>
-                                <% } else if (submitted_User.status==='Accepted' ) { %>
-                                    <p class="decision-accepted">Accepted</p>
+                <% let serialNumber=1; %>
+                    <% submitted_Users.forEach(function(submitted_User){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber++ %>
+                            </td>
+                            <td class="candidate_name">
+                                <%= submitted_User.prefix %>
+                                    <%= submitted_User.first_name %>
+                                        <%= submitted_User.last_name %>
+                            </td>
+                            <td>
+                                <a class="date"
+                                    href="/viewsubmitted/<%=conferenceShortName%>/<%= submitted_User.username %>"
+                                    target="_blank">View</a>
+                            </td>
+                            <td>
+                                <a class="date" href="/<%= submitted_User.abstractFileLocation %>"
+                                    target="_blank">View</a>
+                            </td>
+                            <td>
+                                <% if (submitted_User.status==='Waiting' ) { %>
                                     <form
-                                        action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Waiting"
+                                        action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Accepted"
                                         method="POST" class="form1">
-                                        <button name="Waiting" class="change">Change?</button>
+                                        <button name="Accept" class="accept">Accept</button>
                                     </form>
-                                    <% } else if (submitted_User.status==='Rejected' ) { %>
-                                        <p class="decision-rejected">Rejected</p>
+                                    <form
+                                        action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Rejected"
+                                        method="POST" class="form1">
+                                        <p class="slash">/</p>
+                                        <button name="Reject" class="reject">Reject</button>
+                                    </form>
+                                    <% } else if (submitted_User.status==='Accepted' ) { %>
+                                        <p class="decision-accepted">Accepted</p>
                                         <form
                                             action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Waiting"
                                             method="POST" class="form1">
                                             <button name="Waiting" class="change">Change?</button>
                                         </form>
+                                        <% } else if (submitted_User.status==='Rejected' ) { %>
+                                            <p class="decision-rejected">Rejected</p>
+                                            <form
+                                                action="/decision/<%=conferenceShortName%>/<%= submitted_User.username %>/Waiting"
+                                                method="POST" class="form1">
+                                                <button name="Waiting" class="change">Change?</button>
+                                            </form>
+                                            <% } %>
+                            </td>
+                            <td>
+                                <% if (submitted_User.payment==='Paid' ) { %>
+                                    <p class="serial_number">Paid</p>
+                                    <% } else { %>
+                                        <p class="serial_number">Not Paid</p>
                                         <% } %>
-                        </td>
-                        <td>
-                            <% if(submitted_User.uploadedDocLocation.length===0){%>
+                            </td>
+                            <td>
+                                <% if(submitted_User.uploadedDocLocation.length===0){%>
 
-                                <img class="docs" src="/images/upload_docs.png" alt="">
-                                <%}%>
+                                    <img class="docs" src="/images/upload_docs.png" alt="">
+                                    <%}%>
 
-                                    <% for (let i=0; i < submitted_User.uploadedDocLocation.length; i++) { %>
-                                        <a href="/<%= submitted_User.uploadedDocLocation[i] %>" class="file_name">
-                                            Document-<%= i + 1 %>
-                                        </a>
-                                        <% } %>
-                        </td>
+                                        <% for (let i=0; i < submitted_User.uploadedDocLocation.length; i++) { %>
+                                            <a href="/<%= submitted_User.uploadedDocLocation[i] %>" class="file_name">
+                                                Document-<%= i + 1 %>
+                                            </a>
+                                            <% } %>
+                            </td>
 
-                    </tr>
-                    <% }) %>
+                        </tr>
+                        <% }) %>
             </table>
         </div>
         <%- include("partials/footer")-%>

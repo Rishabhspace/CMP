@@ -17,6 +17,7 @@
 
             <table class="table">
                 <tr class="titles">
+                    <td>S.No.</td>
                     <td>Conference Name</td>
                     <td>Date</td>
                     <td>Location</td>
@@ -24,29 +25,33 @@
 
 
                 </tr>
-                <% conferences.forEach(function(conference){%>
-                    <tr class="entry">
-                        <td class="conference_name">
-                            <%= conference.conf_title %>
-                        </td>
-                        <td>
-                            <a class="date" href="">
-                                <%= formatDate(conference.first_day) %> to <%= formatDate(conference.last_day) %>
-                            </a>
-                        </td>
-                        <td>
-                            <a class="date" href="">
-                                <%= conference.venue %>
-                            </a>
-                        </td>
-                        <td>
-                            <a class="application" href="/register/<%= conference.name %>" target="_blank">
-                                /register/<%= conference.name %>
-                            </a>
-                        </td>
-                        <% }) %>
+                <% let serialNumber=1; %>
+                    <% conferences.forEach(function(conference){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber++ %>
+                            </td>
+                            <td class="conference_name">
+                                <%= conference.conf_title %>
+                            </td>
+                            <td>
+                                <a class="date" href="">
+                                    <%= formatDate(conference.first_day) %> to <%= formatDate(conference.last_day) %>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="date" href="">
+                                    <%= conference.venue %>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="application" href="/register/<%= conference.name %>" target="_blank">
+                                    /register/<%= conference.name %>
+                                </a>
+                            </td>
+                            <% }) %>
 
-                    </tr>
+                        </tr>
             </table>
         </div>
 

@@ -107,10 +107,15 @@ div {
     padding-left: 2.2em;
 }
 
+.serial_number {
+    color: #102E44;
+    font-size: large;
+}
+
 .conference_name {
     color: #102E44;
     font-size: large;
-    padding-left: 3em;
+    /* padding-left: 3em; */
 }
 
 .conference_name1 {

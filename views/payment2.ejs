@@ -1,0 +1,97 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const Razorpay = require('razorpay');
+
+const app = express();
+const port = 3000;
+
+const razorpay = new Razorpay({
+key_id: 'your_key_id',
+key_secret: 'your_key_secret',
+});
+
+app.use(bodyParser.json());
+
+app.get('/', (req, res) => {
+res.send('Welcome to Razorpay Integration Example');
+});
+
+app.post('/create-order', async (req, res) => {
+const amount = 50000; // Amount in paise (e.g., 50000 paise = ₹500)
+const currency = 'INR';
+
+const options = {
+amount,
+currency,
+};
+
+try {
+const order = await razorpay.orders.create(options);
+res.json(order);
+} catch (error) {
+res.status(500).json({ error: 'Error creating order' });
+}
+});
+
+app.post('/capture-payment', async (req, res) => {
+const { paymentId, amount } = req.body;
+
+try {
+const payment = await razorpay.payments.capture(paymentId, amount);
+res.json(payment);
+} catch (error) {
+res.status(500).json({ error: 'Error capturing payment' });
+}
+});
+
+app.listen(port, () => {
+console.log(`Server is running on http://localhost:${port}`);
+});
+
+
+
+<script>
+
+    $(document).ready(function () {
+        $('#payButton').on('click', function () {
+            // Fetch the order ID from your server
+            $.post('/create-order', { /* additional data if needed */ }, function (order) {
+                const options = {
+                    key: 'rzp_test_coP9UgJiM6CqnD',
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: 'IIT Roorkee | CMP',
+                    description: 'Conference Payment',
+                    image: "images/IITR_Logo.png",
+                    order_id: order.id,
+                    handler: function (response) {
+                        // Send the payment ID and order amount to your server for verification
+                        alert(response.razorpay_payment_id);
+                        alert(response.razorpay_order_id);
+                        alert(response.razorpay_signature);
+                        $.post('/capture-payment', { paymentId: response.razorpay_payment_id, amount: order.amount, orderId: response.razorpay_order_id, orderSignatature: response.razorpay_signature }, function (data) {
+                            // Handle the success response from the server
+                            alert('Payment successful! ');
+                        });
+                    },
+                    prefill: {
+                        name: 'John Doe',
+                        email: 'john@example.com',
+                        contact: '+911234567890',
+                    },
+                    notes: {
+                        address: 'Your Company Address',
+                    },
+                    theme: {
+                        color: '#4A7EAD',
+                    },
+                };
+
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+            });
+        });
+    });
+
+
+</script>

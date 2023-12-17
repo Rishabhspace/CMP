@@ -5,6 +5,9 @@
         <li>Accessibility </li>
     </ul>
     <div class="last">
-        <p>Copyright 2023, Institute Computer Centre, IIT Roorkee</p>
+        <p>&copy; <span id="currentYear"></span> | Institute Computer Centre, IIT Roorkee </p>
     </div>
 </div>
+<script>
+    document.getElementById("currentYear").innerHTML = new Date().getFullYear();
+</script>

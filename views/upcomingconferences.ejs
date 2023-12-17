@@ -1,6 +1,6 @@
 <%- include("partials/header")-%>
     <link rel="stylesheet" href="css/conference.css">
-    <title>Your Conferences</title>
+    <title>All Conferences</title>
     </head>
 
     <body>
@@ -8,7 +8,7 @@
             <img class="header-image" src="images/logo_img.png" alt="">
 
             <div class="header">
-                <p class="heading">Your Conferences</p>
+                <p class="heading">Upcoming Conferences</p>
                 <a href="/logout">
                     <img class="logout" src="images/logout.png" alt="">
                     <img class="logout_text" src="images/logout_text.png" alt="">
@@ -20,11 +20,8 @@
                     <td>S.No.</td>
                     <td>Conference Name</td>
                     <td>Date</td>
+                    <td>Location</td>
                     <td>Registration Link</td>
-                    <td>Application</td>
-                    <td>Fee Payment</td>
-                    <td>Edit</td>
-
                 </tr>
                 <% let serialNumber=1; %>
                     <% conferences.forEach(function(conference){%>
@@ -41,37 +38,28 @@
                                 </a>
                             </td>
                             <td>
+                                <a class="date" href="">
+                                    <%= conference.venue %>
+                                </a>
+                            </td>
+                            <td>
                                 <a class="application" href="/register/<%= conference.name %>" target="_blank">
                                     /register/<%= conference.name %>
                                 </a>
                             </td>
+                            <% }) %>
 
-                            <td>
-
-                                <a href="/viewsubmitted/<%= conference.name %>" class="application"><u>Submitted
-                                        Applications</u></a>
-                            </td>
-                            <td>
-                                <a href="/Payment-Report/<%= conference.name %>" class="application"><u>Payment
-                                        Report</u></a>
-                            </td>
-                            <td>
-                                <a href="/edit/<%= conference.name %>" class="tag">
-                                    <button href="/edit/<%= conference.name %>" name="edit" class="edit1">Edit</button>
-                                </a>
-                            </td>
                         </tr>
-                        <% }) %>
             </table>
         </div>
-        <%- include("partials/footer")-%>
 
+        <%- include("partials/footer")-%>
             <script>
-            <% function formatDate(dateString) { %>
-               <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
-               <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
-               <%       return formattedDate.split("/").join("-"); %>
-              <% } %>
+             <% function formatDate(dateString) { %>
+                <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
+                <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
+                <%       return formattedDate.split("/").join("-"); %>
+               <% } %>
 
             </script>
 

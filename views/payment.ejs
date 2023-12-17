@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+    <div>
+        <button id="payButton">Buy Now</button>
+    </div>
+
+    <!-- Razorpay Script -->
+
+    <script>
+        $(document).ready(function () {
+            $('#payButton').on('click', function () {
+                // Fetch the order ID from your server
+                $.post('/create-order', { /* additional data if needed */ }, function (order) {
+                    const options = {
+                        key: 'rzp_test_coP9UgJiM6CqnD',
+                        amount: order.amount,
+                        currency: order.currency,
+                        name: 'IIT Roorkee | CMP',
+                        description: 'Conference Payment',
+                        image: "images/IITR_Logo.png",
+                        order_id: order.id,
+                        handler: function (response) {
+                            // Send the payment ID and order amount to your server for verification
+                            alert(response.razorpay_payment_id);
+                            alert(response.razorpay_order_id);
+                            alert(response.razorpay_signature);
+                            $.post('/capture-payment', { paymentId: response.razorpay_payment_id, amount: order.amount, orderId: response.razorpay_order_id, orderSignatature: response.razorpay_signature }, function (data) {
+                                // Handle the success response from the server
+                                alert('Payment successful! ');
+                            });
+                        },
+                        prefill: {
+                            name: 'John Doe',
+                            email: 'john@example.com',
+                            contact: '+911234567890',
+                        },
+                        notes: {
+                            address: 'Your Company Address',
+                        },
+                        theme: {
+                            color: '#4A7EAD',
+                        },
+                    };
+
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

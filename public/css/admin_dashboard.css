@@ -109,7 +109,7 @@ hr {
 }
 
 .btn2 {
-    width: 120px;
+    /* width: 120px; */
     height: 55px;
     cursor: pointer;
     background: #244862;
@@ -124,7 +124,7 @@ hr {
     text-align: center;
     color: #FFFFFF;
     margin-left: 70px;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .footer {
@@ -167,4 +167,8 @@ li {
 .last p {
     margin: 0;
     /* Remove default paragraph margins */
+}
+
+.support-img {
+    width: 130px;
 }

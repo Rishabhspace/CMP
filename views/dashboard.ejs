@@ -1,5 +1,7 @@
 <%- include("partials/header")-%>
     <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <title>My Applications</title>
     </head>
 
@@ -35,10 +37,57 @@
                             </button>
                         </td>
                         <td>
-                            <button name="Payment" class="<%= conferenceDetail.paymentButton %>">
-                                <%= conferenceDetail.payment %>
-                            </button>
+                            <% if (conferenceDetail.status==='Accepted' && conferenceDetail.payment==='Pay Now' ) { %>
+                                <button name="Payment" id="payButton" class="<%= conferenceDetail.paymentButton %>">
+                                    <%= conferenceDetail.payment %>
+                                </button>
+                                <% } else { %>
+                                    <button name="Payment" class="<%= conferenceDetail.paymentButton %>">
+                                        <%= conferenceDetail.payment %>
+                                    </button>
+                                    <% } %>
                         </td>
+                        <script>
+                            $(document).ready(function () {
+                                $('#payButton').on('click', function () {
+                                    // Fetch the order ID from your server
+                                    $.post('/create-order/<%= conferenceDetail.name %>', { /* additional data if needed */ }, function (order) {
+                                        const options = {
+                                            key: '<%= conferenceDetail.razorpayKey%>',
+                                            amount: order.amount,
+                                            currency: order.currency,
+                                            name: 'CMP | IIT Roorkee',
+                                            description: 'Conference Payment',
+                                            image: "images/IITR_Logo.png",
+                                            order_id: order.id,
+                                            handler: function (response) {
+                                                // Send the payment ID and order amount to your server for verification
+                                                $.post('/capture-payment/<%= conferenceDetail.name %>/<%= conferenceDetail.email %>', { paymentId: response.razorpay_payment_id, amount: order.amount, orderId: response.razorpay_order_id, orderSignature: response.razorpay_signature, currency: order.currency, }, function (data) {
+                                                    // Handle the success response from the server
+                                                    alert(data.Status);
+                                                    window.location.href = "/";
+                                                });
+                                            },
+                                            prefill: {
+                                                name: '<%= conferenceDetail.nameOfUser%>',
+                                                email: '<%= conferenceDetail.email %>',
+                                                contact: '+91 <%= conferenceDetail.phone %>',
+                                            },
+                                            notes: {
+                                                Name: '<%= conferenceDetail.nameOfUser%>',
+                                                Conference_Name: '<%= conferenceDetail.confTitle %>',
+                                            },
+                                            theme: {
+                                                color: '#4A7EAD',
+                                            },
+                                        };
+
+                                        const rzp1 = new Razorpay(options);
+                                        rzp1.open();
+                                    });
+                                });
+                            });
+                        </script>
                         <td>
                             <a class="<%= conferenceDetail.guestHouseButton %>" href="">Book Guest House</a>
                         </td>
