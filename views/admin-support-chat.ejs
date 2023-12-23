@@ -1,0 +1,153 @@
+<%- include("partials/header")-%>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../../css/support.css">
+    <title>Admin Support</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="../../images/logo_img.png" alt="">
+            <div class="header">
+                <p class="heading">Admin Support Dashboard</p>
+                <a href="/logout">
+                    <img class="logout" src="../../images/logout.png" alt="">
+                    <img class="logout_text" src="../../images/logout_text.png" alt="">
+                </a>
+            </div>
+            <div class="message-text"></div>
+            <div class="messages">
+                Admin Support Dashboard
+            </div>
+            <div class="box">
+                <div class="list-user-section">
+                    <a href="/admin-support" class="conference-div">
+                        <div class="list-conference">Notifications
+                        </div>
+                    </a>
+                    <a href="/admin-send-notification" class="conference-div">
+                        <div class="list-conference">Send Notifications</div>
+                    </a>
+
+                    <%usersWithSupportChat.forEach(function(user){%>
+                        <a href="/admin-support-chat/<%= user.conferenceShortName %>/<%= user.username %>"
+                            class="conference-div">
+                            <div class="list-conference">
+                                <%= user.name %> from <%= user.conferenceName %>
+                            </div>
+                        </a>
+                        <% }) %>
+                </div>
+                <div class="message-background">
+                    <div class="message-flow">
+                        <div class="message-text-right">
+                            <p class="text-message">Your user will ask Query over here. <br>
+                                Once you resolve the issue you can click on Done button to close this Query. <br>
+                                Upon clicking done user will disappear from Query Section.
+                            </p>
+                            <p class="messaged-by">
+                                CMP Developer Team
+                            </p>
+                            <p class="message-time">21-12-2023 05:31 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="send-message">
+                    <div class="admin-test">
+                        <input id="message" class="admin-message-input" type="text" placeholder="Type your message...">
+                        <button class="admin-send-button">
+                            <img class="send-button-image" src="../../images/sendIcon.png" alt="">
+                    </div>
+                    <div class="done-button">
+                        <img class="okay-button-img" src="../../images/button.png" alt="">
+                    </div>
+                </div>
+
+            </div>
+            <%- include("partials/footer")-%>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Scroll to the bottom of the message area on page load
+                        var messageFlow = document.querySelector(".message-flow");
+                        messageFlow.scrollTop = messageFlow.scrollHeight;
+                    });
+                    var socket = io();
+                    var userName = '<%=userName%>';
+                    var conferenceName = '<%=conferenceName%>';
+                    var confTitle = '<%= confTitle%>';
+                    $(() => {
+                        $(".admin-send-button").click(() => {
+                            let msg = $("#message").val();
+                            if (msg == "") {
+                                alert("Empty message can't be Send");
+                            } else {
+                                sendMessage({ sender_name: "Admin", sender_email: confTitle, message: $("#message").val(), time: new Date() });
+                            };
+                        })
+                        getMessages();
+                    })
+
+                    $("#message").keydown((event) => {
+                        if (event.key === "Enter") {
+                            let msg = $("#message").val();
+                            if (msg == "") {
+                                alert("Empty message can't be Send");
+                            } else {
+                                sendMessage({ sender_name: "Admin", sender_email: confTitle, message: $("#message").val(), time: new Date() });
+                            };
+                        }
+                    });
+                    $(".okay-button-img").click(() => {
+                        $.post(`/isSolved/${conferenceName}/${userName}`, function (data) {
+                            // Handle the response if needed
+                            console.log(data);
+                            window.location.href = "/admin-support";
+
+                        });
+                    });
+
+                    socket.on('message', addMessages)
+
+                    function addMessages(message) {
+                        if (message.sender_name !== "Admin") {
+                            var messageContainer = $('<div class="message-text-left"></div>');
+                        } else {
+                            var messageContainer = $('<div class="message-text-right"></div>');
+                        }
+                        var textElement = $('<p class="text-message"></p>').text(message.message);
+                        var messagedByElement = $('<p class="messaged-by"></p>').text(message.sender_name + " | " + message.sender_email);
+                        var timeElement = $('<p class="message-time"></p>').text(getFormattedTime(new Date(message.time)));
+
+                        messageContainer.append(textElement, messagedByElement, timeElement);
+                        $(".message-flow").append(messageContainer);
+
+                        // Scroll to the bottom after adding a new message
+                        var messageFlow = document.querySelector(".message-flow");
+                        messageFlow.scrollTop = messageFlow.scrollHeight;
+                    }
+
+                    function getMessages() {
+                        $.get('/support-chat-message/' + conferenceName + "/" + userName, (data) => {
+                            data.forEach(addMessages);
+                        })
+                    }
+
+                    function sendMessage(message) {
+                        $.post('/support-chat-message/' + conferenceName + "/" + userName, message)
+                        $("#message").val("");
+                    }
+
+
+                    function getFormattedTime(date) {
+                        var day = date.getDate().toString().padStart(2, '0');
+                        var month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+                        var year = date.getFullYear();
+                        var hours = date.getHours().toString().padStart(2, '0');
+                        var minutes = date.getMinutes().toString().padStart(2, '0');
+                        return `${day}-${month}-${year} ${hours}:${minutes}`;
+                    }
+                </script>
+    </body>
+
+    </html>

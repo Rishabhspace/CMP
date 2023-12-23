@@ -1,0 +1,121 @@
+<%- include("partials/header")-%>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="css/chat.css">
+    <title>Support Section</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+            <div class="header">
+                <p class="heading">Support Section</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+            <div class="message-text"></div>
+            <div class="messages">Messages</div>
+            <div class="box">
+                <div class="list-user-section">
+                    <p>List user Section</p>
+                </div>
+                <div class="message-background">
+                    <div class="message-flow">
+                        <div class="message-text-right">
+                            <p class="text-message">Hi my Name is Rishabh. I am working on a Conference Management
+                                Portal.
+                            </p>
+                            <p class="messaged-by">
+                                <%=userName%>
+                            </p>
+                            <p class="message-time">21-12-2023 05:31 PM</p>
+                        </div>
+                    </div>
+                    <div class="send-message-header">
+                        <p class="send-message-text">SEND MESSAGE</p>
+                    </div>
+
+                    <div class="send-message">
+                        <input id="message" class="message-input" type="text" placeholder="Type your message...">
+                        <img class="send-button" src="images/sendMessage.png" alt="">
+
+                    </div>
+                </div>
+            </div>
+            <%- include("partials/footer")-%>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Scroll to the bottom of the message area on page load
+                        var messageFlow = document.querySelector(".message-flow");
+                        messageFlow.scrollTop = messageFlow.scrollHeight;
+                    });
+                    var socket = io();
+
+                    $(() => {
+                        $(".send-button").click(() => {
+                            let msg = $("#message").val();
+                            if (msg == "") {
+                                alert("Empty message can't be Send");
+                            } else {
+                                sendMessage({ name: "User1", message: $("#message").val() });
+                            };
+                        })
+                        getMessages();
+                    })
+
+                    $("#message").keydown((event) => {
+                        if (event.key === "Enter") {
+                            let msg = $("#message").val();
+                            if (msg == "") {
+                                alert("Empty message can't be Send");
+                            } else {
+                                sendMessage({ name: "User", message: $("#message").val() });
+                            };
+                        }
+                    });
+
+                    socket.on('message', addMessages)
+
+                    function addMessages(message) {
+                        if (message.name !== "User") {
+                            var messageContainer = $('<div class="message-text-left"></div>');
+                        } else {
+                            var messageContainer = $('<div class="message-text-right"></div>');
+                        }
+                        var textElement = $('<p class="text-message"></p>').text(message.message);
+                        var messagedByElement = $('<p class="messaged-by"></p>').text(message.name);
+                        var timeElement = $('<p class="message-time"></p>').text(getFormattedTime());
+
+                        messageContainer.append(textElement, messagedByElement, timeElement);
+                        $(".message-flow").append(messageContainer);
+
+                        // Scroll to the bottom after adding a new message
+                        var messageFlow = document.querySelector(".message-flow");
+                        messageFlow.scrollTop = messageFlow.scrollHeight;
+                    }
+
+                    function getMessages() {
+                        $.get('/messages', (data) => {
+                            data.forEach(addMessages);
+                        })
+                    }
+
+                    function sendMessage(message) {
+                        $.post('/messages', message)
+                        $("#message").val("");
+                    }
+
+                    function getFormattedTime() {
+                        var now = new Date();
+                        var hours = now.getHours().toString().padStart(2, '0');
+                        var minutes = now.getMinutes().toString().padStart(2, '0');
+                        var seconds = now.getSeconds().toString().padStart(2, '0');
+                        return `${hours}:${minutes}:${seconds}`;
+                    }
+                </script>
+    </body>
+
+    </html>

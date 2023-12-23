@@ -1,0 +1,80 @@
+<%- include("partials/header")-%>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../css/support.css">
+    <title>Support</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="../images/logo_img.png" alt="">
+            <div class="header">
+                <p class="heading">Support</p>
+                <a href="/logout">
+                    <img class="logout" src="../images/logout.png" alt="">
+                    <img class="logout_text" src="../images/logout_text.png" alt="">
+                </a>
+            </div>
+            <div class="message-text"></div>
+            <div class="messages">Notifications</div>
+            <div class="box">
+                <div class="list-user-section">
+                    <a href="/support" class="conference-div">
+                        <div class="list-conference">Notifications</div>
+                    </a>
+                    <% conferences.forEach(function(conference){%>
+                        <a href="/support-chat/<%= conference.name %>" class="conference-div">
+                            <div class="list-conference">
+                                <%= conference.conf_title %> Support
+                            </div>
+                        </a>
+                        <a href="/support/<%= conference.name %>" class="conference-div">
+                            <div class="list-conference">
+                                <%= conference.conf_title %> Group
+                            </div>
+                        </a>
+                        <% }) %>
+                </div>
+                <div class="notification-background">
+                    <div class="message-flow">
+                        <div class="notification-text">
+                            <p class="text-message">This is the Notification Section. <br>
+                                All the Notification related to Conferences will be displayed here. <br>
+                                You can Chat with the Conference Admin by Support Chat. <br>
+                                There is one more Group of your Conference Name where you can chat with other registered
+                                users of this conference.
+                            </p>
+                            <p class="messaged-by">
+                                Conference Admin
+                            </p>
+                            <p class="message-time">21-12-2023 05:31 PM</p>
+                        </div>
+                        <%allNotifications.forEach(function(notification){%>
+                            <div class="notification-text">
+                                <p class="text-message">
+                                    <%= notification.notification %>
+                                </p>
+                                <p class="messaged-by">
+                                    <%= notification.sender %> | <%= notification.conferenceName %>
+                                </p>
+                                <p class="message-time">
+                                    <%= formatDate(notification.time) %>
+                                </p>
+                            </div>
+                            <% }) %>
+                    </div>
+                </div>
+            </div>
+            <%- include("partials/footer")-%>
+                <Script>
+                        <% function formatDate(dateString) { %>
+                         <% const options = { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }; %>
+                         <% const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options); %>
+                        <% const formattedTime = new Date(dateString).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); %>
+                        <% const finalFormattedDate = `${formattedDate.split("/").join("-")}`; %>
+                        <% return finalFormattedDate; %>
+                        <% } %>
+                </Script>
+    </body>
+
+    </html>

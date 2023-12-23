@@ -1,0 +1,141 @@
+<%- include("partials/header")-%>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../css/support.css">
+    <title>Support Chat</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="../images/logo_img.png" alt="">
+            <div class="header">
+                <p class="heading">Support Chat</p>
+                <a href="/logout">
+                    <img class="logout" src="../images/logout.png" alt="">
+                    <img class="logout_text" src="../images/logout_text.png" alt="">
+                </a>
+            </div>
+            <div class="message-text"></div>
+            <div class="messages">
+                <%=thisConference.conf_title%> Support Chat
+            </div>
+            <div class="box">
+                <div class="list-user-section">
+                    <a href="/support" class="conference-div">
+                        <div class="list-conference">Notifications</div>
+                    </a>
+                    <% conferences.forEach(function(conference){%>
+                        <a href="/support-chat/<%= conference.name %>" class="conference-div">
+                            <div class="list-conference">
+                                <%= conference.conf_title %> Support
+                            </div>
+                        </a>
+                        <a href="/support/<%= conference.name %>" class="conference-div">
+                            <div class="list-conference">
+                                <%= conference.conf_title %> Group
+                            </div>
+                        </a>
+                        <% }) %>
+                </div>
+                <div class="message-background">
+                    <div class="message-flow">
+                        <div class="message-text-right">
+                            <p class="text-message">Welcome to <%=thisConference.conf_title%>. You can directly chat
+                                    with Conferene Organiser here
+                            </p>
+                            <p class="messaged-by">
+                                Conference Admin
+                            </p>
+                            <p class="message-time">21-12-2023 05:31 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="send-message">
+                    <div class="test">
+                        <input id="message" class="message-input" type="text" placeholder="Type your message...">
+                        <button class="send-button">
+                            <img class="send-button-image" src="../images/sendIcon.png" alt="">
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <%- include("partials/footer")-%>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Scroll to the bottom of the message area on page load
+                        var messageFlow = document.querySelector(".message-flow");
+                        messageFlow.scrollTop = messageFlow.scrollHeight;
+                    });
+                    var socket = io();
+                    var userName = '<%=userName%>';
+                    var conferenceName = '<%=thisConference.name%>';
+                    var name = '<%=user.first_name%>';
+                    $(() => {
+                        $(".send-button").click(() => {
+                            let msg = $("#message").val();
+                            if (msg == "") {
+                                alert("Empty message can't be Send");
+                            } else {
+                                sendMessage({ sender_name: name, sender_email: userName, message: $("#message").val(), time: new Date() });
+                            };
+                        })
+                        getMessages();
+                    })
+
+                    $("#message").keydown((event) => {
+                        if (event.key === "Enter") {
+                            let msg = $("#message").val();
+                            if (msg == "") {
+                                alert("Empty message can't be Send");
+                            } else {
+                                sendMessage({ sender_name: name, sender_email: userName, message: $("#message").val(), time: new Date() });
+                            };
+                        }
+                    });
+
+                    socket.on('message', addMessages)
+
+                    function addMessages(message) {
+                        if (message.sender_email !== userName) {
+                            var messageContainer = $('<div class="message-text-left"></div>');
+                        } else {
+                            var messageContainer = $('<div class="message-text-right"></div>');
+                        }
+                        var textElement = $('<p class="text-message"></p>').text(message.message);
+                        var messagedByElement = $('<p class="messaged-by"></p>').text(message.sender_name + " | " + message.sender_email);
+                        var timeElement = $('<p class="message-time"></p>').text(getFormattedTime(new Date(message.time)));
+
+                        messageContainer.append(textElement, messagedByElement, timeElement);
+                        $(".message-flow").append(messageContainer);
+
+                        // Scroll to the bottom after adding a new message
+                        var messageFlow = document.querySelector(".message-flow");
+                        messageFlow.scrollTop = messageFlow.scrollHeight;
+                    }
+
+                    function getMessages() {
+                        $.get('/support-chat-message/' + conferenceName + "/" + userName, (data) => {
+                            data.forEach(addMessages);
+                        })
+                    }
+
+                    function sendMessage(message) {
+                        $.post('/support-chat-message/' + conferenceName + "/" + userName, message)
+                        $("#message").val("");
+                    }
+
+
+                    function getFormattedTime(date) {
+                        var day = date.getDate().toString().padStart(2, '0');
+                        var month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+                        var year = date.getFullYear();
+                        var hours = date.getHours().toString().padStart(2, '0');
+                        var minutes = date.getMinutes().toString().padStart(2, '0');
+                        return `${day}-${month}-${year} ${hours}:${minutes}`;
+                    }
+                </script>
+    </body>
+
+    </html>

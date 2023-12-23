@@ -1,0 +1,82 @@
+<%- include("partials/header")-%>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../css/support.css">
+    <title>Admin Support</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="../images/logo_img.png" alt="">
+            <div class="header">
+                <p class="heading">Admin Support Dashboard</p>
+                <a href="/logout">
+                    <img class="logout" src="../images/logout.png" alt="">
+                    <img class="logout_text" src="../images/logout_text.png" alt="">
+                </a>
+            </div>
+            <div class="message-text"></div>
+            <div class="messages">Send Notification</div>
+            <div class="box">
+                <div class="list-user-section">
+                    <a href="/admin-support" class="conference-div">
+                        <div class="list-conference">Notifications
+                        </div>
+                    </a>
+                    <a href="/admin-send-notification" class="conference-div">
+                        <div class="list-conference">Send Notifications</div>
+                    </a>
+                    <%usersWithSupportChat.forEach(function(user){%>
+                        <div class="conference-div">
+                            <a href="/admin-support-chat/<%= user.conferenceShortName %>/<%= user.username %>"
+                                class="list-conference">
+                                <%= user.name %> from <%= user.conferenceName %>
+                            </a>
+                        </div>
+                        <% }) %>
+                </div>
+                <div class="notification-background">
+                    <div class="message-flow">
+                        <form action="/admin-send-notification" method="POST" onsubmit="return validateForm()">
+                            <p class="para">Select the Conference:</p>
+                            <div class="input-group">
+                                <select name="conferenceName" id="conferenceName" required>
+                                    <% conferences.forEach(function(conference) { %>
+                                        <option value="<%= conference.conf_title %>">
+                                            <%= conference.conf_title %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+                            <br>
+                            <p class="para">Message for Notification:</p><br>
+                            <div class="input-group">
+                                <textarea name="notification" cols="100" rows="10" placeholder="Message"
+                                    class="message"></textarea>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <button class="btn">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <%- include("partials/footer")-%>
+
+                <script>
+                    function validateForm() {
+                        var notification = document.getElementsByName("notification")[0].value.trim();
+
+                        if (notification === "") {
+                            alert("Empty notification can't be sent");
+                            return false; // Prevent the form from submitting
+                        }
+
+                        // If validation passes, the form will submit
+                        return true;
+                    }
+                </script>
+    </body>
+
+    </html>

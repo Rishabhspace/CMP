@@ -22,10 +22,14 @@ const pdfTable = require("pdfkit-table");
 
 const app = express();
 
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
+
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 app.use("/abstracts", express.static("abstracts"));
 app.set("view engine", "ejs");
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
@@ -51,6 +55,22 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
   console.log("We are connected");
 });
+
+const messageSchema = new mongoose.Schema({
+  sender_name: String,
+  sender_email: String,
+  message: String,
+  time: Date,
+});
+// const Message = mongoose.model("Message", messageSchema);
+
+const notificationSchema = new mongoose.Schema({
+  sender: String,
+  conferenceName: String,
+  notification: String,
+  time: Date,
+});
+// const Notification = mongoose.model("Notification",notificationSchema);
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -85,6 +105,8 @@ const userSchema = new mongoose.Schema({
   paymentTime: Date,
   orderId: String,
   orderSignature: String,
+  support_chat: [messageSchema],
+  isSolved: Boolean,
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -165,6 +187,8 @@ const conferenceSchema = {
   feeCurrency: String,
   created_by: userSchema,
   users: [userSchema],
+  group_chat: [messageSchema],
+  notification: [notificationSchema],
 };
 const Conference = mongoose.model("Conference", conferenceSchema);
 
@@ -1041,11 +1065,308 @@ app.get("/Payment-Report/:conferenceName", isAdmin, async (req, res) => {
   }
 });
 
+//Support Section
+//User Portal Support Section
+
+app.get("/support", isUser, async function (req, res) {
+  const reqUser = req.user.username;
+  const user = await User.findOne({ username: reqUser });
+  const userRegisteredInConference = user.conference_name;
+  const findAllConference = await Conference.find({
+    name: { $in: userRegisteredInConference },
+  });
+  const conferences = await Conference.find({
+    name: { $in: userRegisteredInConference },
+  });
+  const allNotifications = [];
+  conferences.forEach((conference) => {
+    conference.notification.forEach((notification) => {
+      allNotifications.push(notification);
+    });
+  });
+  res.render("support", {
+    userName: reqUser,
+    user: user,
+    conferences: findAllConference,
+    allNotifications: allNotifications,
+  });
+});
+
+app.get("/support/:conferenceName", isUser, async function (req, res) {
+  const conferenceName = req.params.conferenceName;
+  const thisConference = await Conference.findOne({ name: conferenceName });
+  const reqUser = req.user.username;
+  const user = await User.findOne({ username: reqUser });
+  const userRegisteredInConference = user.conference_name;
+  const findAllConference = await Conference.find({
+    name: { $in: userRegisteredInConference },
+  });
+  res.render("support-group-chat", {
+    userName: reqUser,
+    user: user,
+    conferences: findAllConference,
+    thisConference: thisConference,
+  });
+});
+
+app.get("/support-chat/:conferenceName", isUser, async function (req, res) {
+  const conferenceName = req.params.conferenceName;
+  const thisConference = await Conference.findOne({ name: conferenceName });
+  const reqUser = req.user.username;
+  const user = await User.findOne({ username: reqUser });
+  const userRegisteredInConference = user.conference_name;
+  const findAllConference = await Conference.find({
+    name: { $in: userRegisteredInConference },
+  });
+  res.render("support-chat", {
+    userName: reqUser,
+    user: user,
+    conferences: findAllConference,
+    thisConference: thisConference,
+  });
+});
+
+app.get("/messages/:conferenceName", async (req, res) => {
+  try {
+    const conferenceName = req.params.conferenceName;
+    const conference = await Conference.findOne({ name: conferenceName });
+    const messages = conference.group_chat;
+    res.send(messages);
+  } catch (error) {
+    res.sendStatus(500);
+    console.error("Error fetching messages for user:", error);
+  }
+});
+
+app.post("/messages/:conferenceName", async (req, res) => {
+  try {
+    const conferenceName = req.params.conferenceName;
+    await Conference.updateOne(
+      { name: conferenceName },
+      { $push: { group_chat: req.body } }
+    );
+    io.emit("message", req.body);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+    return console.log("error", error);
+  } finally {
+    // console.log("Message send");
+  }
+});
+
+app.get("/support-chat-message/:conferenceName/:userName", async (req, res) => {
+  try {
+    const conferenceName = req.params.conferenceName;
+    const userName = req.params.userName;
+    const conference = await Conference.findOne({ name: conferenceName });
+    const user = conference.users.find((user) => user.username === userName);
+    const messages = user.support_chat;
+    res.send(messages);
+  } catch (error) {
+    res.sendStatus(500);
+    console.error("Error fetching messages for user:", error);
+  }
+});
+
+app.post(
+  "/support-chat-message/:conferenceName/:userName",
+  async (req, res) => {
+    try {
+      const conferenceName = req.params.conferenceName;
+      const userName = req.params.userName;
+      const conference = await Conference.findOne({ name: conferenceName });
+      const user = conference.users.find((user) => user.username === userName);
+      await Conference.updateOne(
+        { name: conferenceName, "users.username": userName },
+        {
+          $push: { "users.$.support_chat": req.body },
+          $set: { "users.$.isSolved": false },
+        }
+      );
+      io.emit("message", req.body);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+      return console.log("error", error);
+    } finally {
+      // console.log("Message send");
+    }
+  }
+);
+
+//Admin Portal Support Section
+
+app.get("/admin-support", isAdmin, async function (req, res) {
+  try {
+    // Find the admin user
+    const conf_creator = req.user.username;
+    // Find conferences created by the admin
+    const conferences = await Conference.find({
+      "created_by.username": conf_creator,
+    });
+    const allNotifications = [];
+    conferences.forEach((conference) => {
+      conference.notification.forEach((notification) => {
+        allNotifications.push(notification);
+      });
+    });
+    // console.log(allNotifications);
+
+    // Filter conferences based on the presence of at least one entry in support_chat and isSolved:false
+    const conferencesWithSupportChat = await Conference.find({
+      _id: { $in: conferences.map((conf) => conf._id) },
+    });
+    // Extract usernames with at least one entry in support_chat
+    const usersWithSupportChat = conferencesWithSupportChat.reduce(
+      (usernames, conference) => {
+        conference.users.forEach((user) => {
+          if (user.support_chat.length > 0 && user.isSolved == false) {
+            usernames.push({
+              username: user.username,
+              name: user.first_name,
+              conferenceName: conference.conf_title,
+              conferenceShortName: conference.name,
+            });
+          }
+        });
+        return usernames;
+      },
+      []
+    );
+
+    res.render("admin-support", {
+      usersWithSupportChat: usersWithSupportChat,
+      conferences: conferences,
+      allNotifications: allNotifications,
+    });
+  } catch (error) {
+    console.error("Error in /admin-support route:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/admin-send-notification", isAdmin, async function (req, res) {
+  try {
+    // Find the admin user
+    const conf_creator = req.user.username;
+    // Find conferences created by the admin
+    const conferences = await Conference.find({
+      "created_by.username": conf_creator,
+    });
+    // Filter conferences based on the presence of at least one entry in support_chat and isSolved:false
+    const conferencesWithSupportChat = await Conference.find({
+      _id: { $in: conferences.map((conf) => conf._id) },
+    });
+    // Extract usernames with at least one entry in support_chat
+    const usersWithSupportChat = conferencesWithSupportChat.reduce(
+      (usernames, conference) => {
+        conference.users.forEach((user) => {
+          if (user.support_chat.length > 0 && user.isSolved == false) {
+            usernames.push({
+              username: user.username,
+              name: user.first_name,
+              conferenceName: conference.conf_title,
+              conferenceShortName: conference.name,
+            });
+          }
+        });
+        return usernames;
+      },
+      []
+    );
+
+    res.render("admin-send-notification", {
+      usersWithSupportChat: usersWithSupportChat,
+      conferences: conferences,
+    });
+  } catch (error) {
+    console.error("Error in /admin-support route:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/admin-send-notification", async function (req, res) {
+  const conferenceName = req.body.conferenceName;
+  const notification = req.body.notification;
+  const saveNotification = {
+    sender: "Admin",
+    conferenceName: conferenceName,
+    notification: notification,
+    time: new Date(),
+  };
+
+  await Conference.updateOne(
+    { conf_title: conferenceName },
+    { $push: { notification: saveNotification } }
+  );
+  res.redirect("/admin-support");
+});
+
+app.get(
+  "/admin-support-chat/:conferenceName/:userName",
+  isUser,
+  async function (req, res) {
+    const conferenceName = req.params.conferenceName;
+    const userName = req.params.userName;
+    const conf_creator = req.user.username;
+    const conf = await Conference.findOne({ name: conferenceName });
+    const confTitle = conf.conf_title;
+    // Find conferences created by the admin
+    const conferences = await Conference.find({
+      "created_by.username": conf_creator,
+    });
+    // Filter conferences based on the presence of at least one entry in support_chat and isSolved:false
+    const conferencesWithSupportChat = await Conference.find({
+      _id: { $in: conferences.map((conf) => conf._id) },
+    });
+    // Extract usernames with at least one entry in support_chat
+    const usersWithSupportChat = conferencesWithSupportChat.reduce(
+      (usernames, conference) => {
+        conference.users.forEach((user) => {
+          if (user.support_chat.length > 0 && user.isSolved == false) {
+            usernames.push({
+              username: user.username,
+              name: user.first_name,
+              conferenceName: conference.conf_title,
+              conferenceShortName: conference.name,
+            });
+          }
+        });
+        return usernames;
+      },
+      []
+    );
+
+    res.render("admin-support-chat", {
+      usersWithSupportChat: usersWithSupportChat,
+      userName: userName,
+      conferenceName: conferenceName,
+      confTitle: confTitle,
+    });
+  }
+);
+
+app.post("/isSolved/:conferenceName/:userName", async function (req, res) {
+  const conferenceName = req.params.conferenceName;
+  const userName = req.params.userName;
+
+  const result = await Conference.updateOne(
+    { name: conferenceName, "users.username": userName },
+    { $set: { "users.$.isSolved": true } }
+  );
+  res.sendStatus(200);
+});
+
+io.on("connection", () => {
+  // console.log("a user is connected");
+});
+
 let port = process.env.PORT;
 if ((port == null) | (port == "")) {
   port = 3000;
 }
 
-app.listen(port, function () {
+http.listen(port, function () {
   console.log("Server started on port " + port);
 });
