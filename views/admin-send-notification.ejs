@@ -9,7 +9,7 @@
         <div class="background">
             <img class="header-image" src="../images/logo_img.png" alt="">
             <div class="header">
-                <p class="heading">Admin Support Dashboard</p>
+                <p class="heading">Notification Tab</p>
                 <a href="/logout">
                     <img class="logout" src="../images/logout.png" alt="">
                     <img class="logout_text" src="../images/logout_text.png" alt="">
@@ -19,21 +19,13 @@
             <div class="messages">Send Notification</div>
             <div class="box">
                 <div class="list-user-section">
-                    <a href="/admin-support" class="conference-div">
+                    <a href="/notification" class="conference-div">
                         <div class="list-conference">Notifications
                         </div>
                     </a>
                     <a href="/admin-send-notification" class="conference-div">
                         <div class="list-conference">Send Notifications</div>
                     </a>
-                    <%usersWithSupportChat.forEach(function(user){%>
-                        <div class="conference-div">
-                            <a href="/admin-support-chat/<%= user.conferenceShortName %>/<%= user.username %>"
-                                class="list-conference">
-                                <%= user.name %> from <%= user.conferenceName %>
-                            </a>
-                        </div>
-                        <% }) %>
                 </div>
                 <div class="notification-background">
                     <div class="message-flow">

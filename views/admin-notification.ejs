@@ -9,38 +9,49 @@
         <div class="background">
             <img class="header-image" src="../images/logo_img.png" alt="">
             <div class="header">
-                <p class="heading">Admin Support Dashboard</p>
+                <p class="heading">Notification Tab</p>
                 <a href="/logout">
                     <img class="logout" src="../images/logout.png" alt="">
                     <img class="logout_text" src="../images/logout_text.png" alt="">
                 </a>
             </div>
             <div class="message-text"></div>
-            <div class="messages">Support Query</div>
+            <div class="messages">Notifications</div>
             <div class="box">
                 <div class="list-user-section">
-                    <%usersWithSupportChat.forEach(function(user){%>
-                        <div class="conference-div">
-                            <a href="/admin-support-chat/<%= user.conferenceShortName %>/<%= user.username %>"
-                                class="list-conference">
-                                <%= user.name %> from <%= user.conferenceName %>
-                            </a>
+                    <a href="/notification" class="conference-div">
+                        <div class="list-conference">Notifications
                         </div>
-                        <% }) %>
+                    </a>
+                    <a href="/admin-send-notification" class="conference-div">
+                        <div class="list-conference">Send Notifications</div>
+                    </a>
                 </div>
                 <div class="notification-background">
                     <div class="message-flow">
                         <div class="notification-text">
-                            <p class="text-message">This is the Support Section. <br>
-                                All the Support query chats will appear when user will raise any Query for Support. <br>
-                                It is advised you to mark done after query is solved to avoid confusion which query is
-                                solved or not. <br>
+                            <p class="text-message">This is the Notification Section. <br>
+                                All the Notification sent by you will be displayed here. <br>
+                                You can send the notification via send notification Tab. <br>
                             </p>
                             <p class="messaged-by">
                                 CMP Development Team
                             </p>
                             <p class="message-time">21-12-2023 05:31 PM</p>
                         </div>
+                        <%allNotifications.forEach(function(notification){%>
+                            <div class="notification-text">
+                                <p class="text-message">
+                                    <%= notification.notification %>
+                                </p>
+                                <p class="messaged-by">
+                                    <%= notification.sender %> | <%= notification.conferenceName %>
+                                </p>
+                                <p class="message-time">
+                                    <%= formatDate(notification.time) %>
+                                </p>
+                            </div>
+                            <% }) %>
                     </div>
                 </div>
             </div>

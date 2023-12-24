@@ -21,14 +21,6 @@
             </div>
             <div class="box">
                 <div class="list-user-section">
-                    <a href="/admin-support" class="conference-div">
-                        <div class="list-conference">Notifications
-                        </div>
-                    </a>
-                    <a href="/admin-send-notification" class="conference-div">
-                        <div class="list-conference">Send Notifications</div>
-                    </a>
-
                     <%usersWithSupportChat.forEach(function(user){%>
                         <a href="/admin-support-chat/<%= user.conferenceShortName %>/<%= user.username %>"
                             class="conference-div">

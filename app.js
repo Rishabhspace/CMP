@@ -1246,6 +1246,32 @@ app.get("/admin-support", isAdmin, async function (req, res) {
   }
 });
 
+app.get("/notification", isAdmin, async function (req, res) {
+  try {
+    // Find the admin user
+    const conf_creator = req.user.username;
+    // Find conferences created by the admin
+    const conferences = await Conference.find({
+      "created_by.username": conf_creator,
+    });
+    const allNotifications = [];
+    conferences.forEach((conference) => {
+      conference.notification.forEach((notification) => {
+        allNotifications.push(notification);
+      });
+    });
+    // console.log(allNotifications);
+
+    res.render("admin-notification", {
+      conferences: conferences,
+      allNotifications: allNotifications,
+    });
+  } catch (error) {
+    console.error("Error in /admin-support route:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.get("/admin-send-notification", isAdmin, async function (req, res) {
   try {
     // Find the admin user
@@ -1254,30 +1280,8 @@ app.get("/admin-send-notification", isAdmin, async function (req, res) {
     const conferences = await Conference.find({
       "created_by.username": conf_creator,
     });
-    // Filter conferences based on the presence of at least one entry in support_chat and isSolved:false
-    const conferencesWithSupportChat = await Conference.find({
-      _id: { $in: conferences.map((conf) => conf._id) },
-    });
-    // Extract usernames with at least one entry in support_chat
-    const usersWithSupportChat = conferencesWithSupportChat.reduce(
-      (usernames, conference) => {
-        conference.users.forEach((user) => {
-          if (user.support_chat.length > 0 && user.isSolved == false) {
-            usernames.push({
-              username: user.username,
-              name: user.first_name,
-              conferenceName: conference.conf_title,
-              conferenceShortName: conference.name,
-            });
-          }
-        });
-        return usernames;
-      },
-      []
-    );
 
     res.render("admin-send-notification", {
-      usersWithSupportChat: usersWithSupportChat,
       conferences: conferences,
     });
   } catch (error) {
