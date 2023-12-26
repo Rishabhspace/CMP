@@ -1,0 +1,95 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="/css/sub_app.css">
+    <script src="/js/script.js"></script>
+    <title>Requests for Booking</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="/images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Requests for Venue Booking
+                </p>
+                <a href="/logout">
+                    <img class="logout" src="/images/logout.png" alt="">
+                    <img class="logout_text" src="/images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No</td>
+                    <td>Venue</td>
+                    <td>Booking Date</td>
+                    <td>Time</td>
+                    <td>Purpose</td>
+                    <td>Booked By</td>
+                    <td>Decision</td>
+                </tr>
+                <% let serialNumber=1 %>
+                    <% submitted_venues.forEach(function(submitted_venue){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber %>
+                            </td>
+                            <td class="serial_number">
+                                <%= submitted_venue.select_venue%>
+                            </td>
+                            <td class="date">
+                                <%= formatDate(submitted_venue.date) %>
+                            </td>
+                            <td class="date">
+                                <%= submitted_venue.time_in_venue %> to <%= submitted_venue.time_out_venue %>
+                            </td>
+
+                            <td class="serial_number">
+                                <%= submitted_venue.Purpose%>
+                            </td>
+                            <td class="serial_number">
+                                <%= submitted_venue.admin_name%>
+                            </td>
+                            <td>
+                                <% if (submitted_venue.status==='Waiting' ) { %>
+                                    <form action="/decision-venue/<%= submitted_venue._id %>/Accepted" method="POST"
+                                        class="form1">
+                                        <button name="Accept" class="accept">Accept</button>
+                                    </form>
+                                    <form action="/decision-venue/<%= submitted_venue._id %>/Rejected" method="POST"
+                                        class="form1">
+                                        <p class="slash">/</p>
+                                        <button name="Reject" class="reject">Reject</button>
+                                    </form>
+                                    <% } else if (submitted_venue.status==='Accepted' ) { %>
+                                        <p class="decision-accepted">Accepted</p>
+                                        <form action="/decision-venue/<%= submitted_venue._id %>/Waiting" method="POST"
+                                            class="form1">
+                                            <button name="Waiting" class="change">Change?</button>
+                                        </form>
+                                        <% } else if (submitted_venue.status==='Rejected' ) { %>
+                                            <p class="decision-rejected">Rejected</p>
+                                            <form action="/decision-venue/<%= submitted_venue._id %>/Waiting"
+                                                method="POST" class="form1">
+                                                <button name="Waiting" class="change">Change?</button>
+                                            </form>
+                                            <% } %>
+
+                            </td>
+                            <% serialNumber++; %>
+                        </tr>
+                        <% }) %>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+            <script>
+            <% function formatDate(dateString) { %>
+               <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
+               <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
+               <%       return formattedDate.split("/").join("-"); %>
+              <% } %>
+
+            </script>
+    </body>
+
+    </html>

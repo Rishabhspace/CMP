@@ -1,0 +1,63 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>All Vehicles</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">All Vehicles</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No</td>
+                    <td>Vehicle Name</td>
+                    <td>Delete Vehicle</td>
+                </tr>
+                <% let serialNumber=1 %>
+                    <% addvehicles.forEach(function(newvehicle){ %>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber %>
+                            </td>
+
+                            <td class="conference_name">
+                                <%= newvehicle.vehicle_name %>
+                            </td>
+                            <td>
+                                <form action="/delete-vehicle/<%= newvehicle._id %>" method="POST" class="delete-form">
+                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Delete</button>
+                                </form>
+                            </td>
+                            <% serialNumber++; %>
+                        </tr>
+                        <% }) %>
+                            <tr class="entry">
+                                <td colspan="3" class="serial_number">
+                                    <form action="/addvehicle" method="post">
+                                        Want to Add more Vehicle ?
+                                        <input type="text" name="vehicle_name" placeholder="Add a new Vehicle">
+                                        <button class="edit">Add Now</button>
+                                    </form>
+                                </td>
+                            </tr>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+
+            <script>
+                function confirmDelete() {
+                    return confirm("Are you sure you want to delete this Vehicle?");
+                }
+            </script>
+    </body>
+
+    </html>

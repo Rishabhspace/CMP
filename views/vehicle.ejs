@@ -9,47 +9,73 @@
 
             <div class="header">
                 <p class="heading">Vehicle Booking</p>
-                <a href="admin_portal.html">
+                <a href="/logout">
                     <img class="logout" src="images/logout.png" alt="">
                     <img class="logout_text" src="images/logout_text.png" alt="">
                 </a>
             </div>
 
-            <table class="table1">
-                <thead class="titles">
-                    <td class="a">Available Vehicle</td>
-                    <td class="b">Status</td>
-
-
-                </thead>
-                <tbody class="entry">
-                    <td class="conference_name">Bus-102</td>
-
-                    <td class="date">
-                        <button name="edit" class="edit">BOOK NOW</button>
-                    </td>
-
-                </tbody>
-                <tbody class="entry">
-                    <td class="conference_name"> Bus-103</td>
-
-                    <td class="date">
-                        <button name="edit" class="edit2">Confirmed</button>
-                    </td>
-
-                </tbody>
-                <tbody class="entry">
-                    <td class="conference_name">Rickshaw</td>
-
-                    <td class="date">
-                        <button name="edit" class="edit3">Confirming</button>
-                    </td>
-
-                </tbody>
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No</td>
+                    <td>Vehicle Name</td>
+                    <td>Date</td>
+                    <td>Time</td>
+                    <td>Status</td>
+                    <td>Cancel Booking</td>
+                </tr>
+                <% let serialNumber=1 %>
+                    <% created_vehicles.forEach(function(admin_vehicle){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber %>
+                            </td>
+                            <td class="conference_name">
+                                <%= admin_vehicle.select_vehicle %>
+                            </td>
+                            <td class="serial_number">
+                                <%= formatDate(admin_vehicle.date_for_vehicle) %>
+                            </td>
+                            <td class="serial_number">
+                                <%= admin_vehicle.time_for_vehicle %>
+                            </td>
+                            <td class="serial_number">
+                                <%= admin_vehicle.status %>
+                            </td>
+                            <td class="serial_number">
+                                <form action="/deleteVehicle/<%= admin_vehicle._id %>" method="POST"
+                                    class="delete-form">
+                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Cancel</button>
+                                </form>
+                            </td>
+                            <% serialNumber++; %>
+                        </tr>
+                        <% }) %>
+                            <tr class="entry">
+                                <td colspan="6" class="serial_number">
+                                    Want to Book a Vehicle?
+                                    <a href="/vehiclebook">
+                                        <button class="edit">Book Now</button>
+                                    </a>
+                                </td>
+                            </tr>
             </table>
         </div>
         <%- include("partials/footer")-%>
+            <script>
+            <% function formatDate(dateString) { %>
+               <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
+               <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
+               <%       return formattedDate.split("/").join("-"); %>
+              <% } %>
 
+            </script>
+            <script>
+                    function confirmDelete() {
+                        return confirm("Are you sure you want to request for Cancellation?");
+                    }
+
+            </script>
     </body>
 
     </html>

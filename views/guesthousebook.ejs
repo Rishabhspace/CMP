@@ -1,0 +1,74 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/style_new_conf.css">
+    <title>New Conference</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Book Guesthouse</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="form">
+                <form action="/guesthousebook" method="POST" class="new_conf_form">
+                    <p class="para"> Guest Name:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="guestname" value="" required>
+                    </div>
+                    <br>
+                    <p class="para"> Purpose:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="Purpose" value="" required>
+                    </div>
+                    <br>
+                    <p class="para"> Number Of Rooms:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="noofroom" value="" required>
+                    </div>
+                    <br>
+                    <p class="para">Select the Guesthouse:</p>
+                    <div class="input-group">
+                        <select name="select_guesthouse" id="select_guesthouse" required>
+                            <option value="">Select Guesthouse</option>
+                            <% addguesthouses.forEach(function(newguesthouse) { %>
+                                <option value="<%= newguesthouse.guesthouse_name %>">
+                                    <%= newguesthouse.guesthouse_name %>
+                                </option>
+                                <% }) %>
+                        </select>
+                    </div>
+                    <br>
+                    <p class="date">Dates:</p>
+                    <p class="para date2">Check-in:</p>
+                    <div class="input-group">
+                        <input type="date" placeholder="" name="checkin" value="" required>
+                    </div>
+                    <p class="para date2">Check-out:</p>
+                    <div class="input-group">
+                        <input type="date" placeholder="" name="checkout" value="" required>
+                    </div>
+                    <br>
+
+
+                    <p class="para"> Remark:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="remark" value="" required>
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <button class="btn">Confirm Booking</button>
+                    </div>
+                </form>
+
+            </div>
+            <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

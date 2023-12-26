@@ -1,0 +1,58 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/style_new_conf.css">
+    <title>New Conference</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Book Venue</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="form">
+                <form action="/venuebook" method="POST" class="new_conf_form">
+
+                    <div class="input-group">
+                        <p class="para"> Purpose:</p>
+                        <input type="text" placeholder="" name="Purpose" value="" required>
+                        <br>
+                        <p class="para">Estimated Number Of Participant:</p>
+                        <input type="text" placeholder="" name="no_of_participant" value="" required>
+                        <br>
+                        <p class="para">Select the venue:</p>
+                        <select name="select_venue" id="select_venue" required>
+                            <option value="">Select venue</option>
+                            <% addvenues.forEach(function(newvenue) { %>
+                                <option value="<%= newvenue.venue_name %>">
+                                    <%= newvenue.venue_name %>
+                                </option>
+                                <% }) %>
+                        </select>
+                        <br>
+                        <p class="para date2">Date:</p>
+                        <input type="date" placeholder="" name="date" value="" required>
+                        <br>
+                        <p class="para date2">Start Time:</p>
+                        <input type="time" placeholder="" name="time_in_venue" value="" required>
+                        <p class="para date2">End Time:</p>
+                        <input type="time" placeholder="" name="time_out_venue" value="" required>
+                        <br>
+                        <p class="para"> Remark:</p>
+                        <input type="text" placeholder="" name="remark" value="" required>
+                        <br>
+                        <button class="btn">Book Now</button>
+                    </div>
+                </form>
+
+            </div>
+            <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

@@ -198,6 +198,12 @@ app.get("/", async function (req, res) {
     const user = await User.findOne({ username: userName });
     if (user.role === "admin") {
       res.redirect("/admindashboard");
+    } else if (user.role === "venuehead") {
+      res.redirect("/venuedashboard");
+    } else if (user.role === "vehiclehead") {
+      res.redirect("/vehicledashboard");
+    } else if (user.role === "guesthousehead") {
+      res.redirect("/guesthousedashboard");
     } else if (user.role === "user") {
       res.redirect("/dashboard");
     }
@@ -360,6 +366,68 @@ async function isAdmin(req, res, next) {
     res.redirect("/");
   }
 }
+
+async function isvenueAdmin(req, res, next) {
+  if (req.isAuthenticated()) {
+    const userName = req.session.passport.user.username;
+    try {
+      const findUser = await User.findOne({ username: userName });
+      if (findUser && findUser.role === "venuehead") {
+        // User found and has admin role
+        return next();
+      } else {
+        // User not found or doesn't have admin role
+        res.redirect("/");
+      }
+    } catch (error) {
+      console.error("Error finding user:", error);
+      res.redirect("/");
+    }
+  } else {
+    res.redirect("/");
+  }
+}
+async function isvehicleAdmin(req, res, next) {
+  if (req.isAuthenticated()) {
+    const userName = req.session.passport.user.username;
+    try {
+      const findUser = await User.findOne({ username: userName });
+      if (findUser && findUser.role === "vehiclehead") {
+        // User found and has admin role
+        return next();
+      } else {
+        // User not found or doesn't have admin role
+        res.redirect("/");
+      }
+    } catch (error) {
+      console.error("Error finding user:", error);
+      res.redirect("/");
+    }
+  } else {
+    res.redirect("/");
+  }
+}
+async function isguesthouseAdmin(req, res, next) {
+  if (req.isAuthenticated()) {
+    const userName = req.session.passport.user.username;
+    try {
+      const findUser = await User.findOne({ username: userName });
+      if (findUser && findUser.role === "guesthousehead") {
+        // User found and has admin role
+        return next();
+      } else {
+        // User not found or doesn't have admin role
+        res.redirect("/");
+      }
+    } catch (error) {
+      console.error("Error finding user:", error);
+      res.redirect("/");
+    }
+  } else {
+    res.redirect("/");
+  }
+}
+
 //Just Checking the isExactAdmin
 function exactAdmin(conferenceName) {
   return async function isExactAdmin(req, res, next) {
@@ -511,22 +579,6 @@ app.get("/edit/:name", isAdmin, async (req, res) => {
   }
 });
 
-app.get("/vehicle", function (req, res) {
-  res.render("vehicle");
-});
-
-app.get("/venue", function (req, res) {
-  res.render("venue");
-});
-
-app.get("/guesthouse", function (req, res) {
-  res.render("guesthouse");
-});
-
-app.get("/book", function (req, res) {
-  res.render("book");
-});
-
 //Admin Post request
 app.post("/createconference", async function (req, res) {
   try {
@@ -657,6 +709,12 @@ app.post("/", function (req, res) {
         } else if (user.role === "user") {
           // Redirect to user dashboard
           res.redirect("/dashboard");
+        } else if (user.role === "venuehead") {
+          res.redirect("/venuedashboard");
+        } else if (user.role === "vehiclehead") {
+          res.redirect("/vehicledashboard");
+        } else if (user.role === "guesthousehead") {
+          res.redirect("/guesthousedashboard");
         } else {
           // Handle other roles or scenarios
           res.redirect("/");
@@ -1365,6 +1423,624 @@ app.post("/isSolved/:conferenceName/:userName", async function (req, res) {
 io.on("connection", () => {
   // console.log("a user is connected");
 });
+
+//<<---------Coded By Prachi---------------->>
+
+app.get("/vehicledashboard", isvehicleAdmin, function (req, res) {
+  res.render("vehicledashboard");
+});
+app.get("/venuedashboard", isvenueAdmin, function (req, res) {
+  res.render("venuedashboard");
+});
+app.get("/guesthousedashboard", isguesthouseAdmin, function (req, res) {
+  res.render("guesthousedashboard");
+});
+
+app.get("/addvenue", isvenueAdmin, function (req, res) {
+  res.render("addvenue");
+});
+app.get("/addvehicle", isvehicleAdmin, function (req, res) {
+  res.render("addvehicle");
+});
+app.get("/addguesthouse", isguesthouseAdmin, function (req, res) {
+  res.render("addguesthouse");
+});
+const addvenueSchema = {
+  venue_name: String,
+  name: String,
+};
+const addvehicleSchema = {
+  vehicle_name: String,
+  name: String,
+};
+const addguesthouseSchema = {
+  guesthouse_name: String,
+  name: String,
+};
+
+const Addvenue = mongoose.model("addvenue", addvenueSchema);
+const Addvehicle = mongoose.model("addvehicle", addvehicleSchema);
+const Addguesthouse = mongoose.model("addguesthouse", addguesthouseSchema);
+
+app.post("/addvenue", async function (req, res) {
+  try {
+    const venuename = _.lowerCase(req.body.venue_name).split(" ").join("");
+    const existingvenue = await Addvenue.findOne({ name: venuename });
+
+    if (existingvenue) {
+      // If the conference already exists, send a response to the client
+      const alertMessage = "This Venue already exists";
+      const script = `<script>alert('${alertMessage}'); window.location='/allvenue';</script>`;
+      return res.send(script);
+    }
+    const addnewvenue = new Addvenue({
+      venue_name: req.body.venue_name,
+      name: _.lowerCase(req.body.venue_name).split(" ").join(""),
+    });
+
+    await addnewvenue.save();
+    res.redirect("/allvenue");
+  } catch (err) {
+    console.error(err);
+    alert(err);
+    res.redirect("/addvenue");
+  }
+});
+
+app.post("/addvehicle", async function (req, res) {
+  try {
+    const vehiclename = _.lowerCase(req.body.vehicle_name).split(" ").join("");
+
+    const existingvehicle = await Addvehicle.findOne({
+      name: vehiclename,
+    });
+
+    if (existingvehicle) {
+      // If the conference already exists, send a response to the client
+      const alertMessage = "This Vehicle already exists";
+      const script = `<script>alert('${alertMessage}'); window.location='/addvehicle';</script>`;
+      return res.send(script);
+    }
+    const addnewvehicle = new Addvehicle({
+      vehicle_name: req.body.vehicle_name,
+      name: _.lowerCase(req.body.vehicle_name).split(" ").join(""),
+    });
+
+    await addnewvehicle.save();
+    res.redirect("/allvehicle");
+  } catch (err) {
+    console.error(err);
+    alert(err);
+    res.redirect("/addvehicle");
+  }
+});
+app.post("/addguesthouse", async function (req, res) {
+  try {
+    const guesthousename = _.lowerCase(req.body.guesthouse_name)
+      .split(" ")
+      .join("");
+
+    const existingguesthouse = await Addguesthouse.findOne({
+      name: guesthousename,
+    });
+
+    if (existingguesthouse) {
+      // If the conference already exists, send a response to the client
+      const alertMessage = "This Guesthouse already exists";
+      const script = `<script>alert('${alertMessage}'); window.location='/allguesthouse';</script>`;
+      return res.send(script);
+    }
+    const addnewguesthouse = new Addguesthouse({
+      guesthouse_name: req.body.guesthouse_name,
+      name: _.lowerCase(req.body.guesthouse_name).split(" ").join(""),
+    });
+
+    await addnewguesthouse.save();
+    res.redirect("/allguesthouse");
+  } catch (err) {
+    console.error(err);
+    alert(err);
+    res.redirect("/addguesthouse");
+  }
+});
+
+app.get("/allvenue", isvenueAdmin, function (req, res) {
+  find();
+
+  async function find() {
+    try {
+      const newvenue = await Addvenue.find();
+      res.render("allvenue", {
+        addvenues: newvenue,
+      });
+    } catch (e) {
+      console.log(e.message);
+      // Handle the error appropriately, e.g., render an error page
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+app.get("/allvehicle", isvehicleAdmin, function (req, res) {
+  find();
+
+  async function find() {
+    try {
+      const newvehicle = await Addvehicle.find();
+      res.render("allvehicle", {
+        addvehicles: newvehicle,
+      });
+    } catch (e) {
+      console.log(e.message);
+      // Handle the error appropriately, e.g., render an error page
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+app.get("/allguesthouse", isguesthouseAdmin, function (req, res) {
+  find();
+
+  async function find() {
+    try {
+      const newguesthouse = await Addguesthouse.find();
+      res.render("allguesthouse", {
+        addguesthouses: newguesthouse,
+      });
+    } catch (e) {
+      console.log(e.message);
+      // Handle the error appropriately, e.g., render an error page
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+app.post("/delete-venue/:id", async (req, res) => {
+  try {
+    await Addvenue.findByIdAndDelete({ _id: req.params.id });
+    res.redirect("/allvenue");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+app.post("/delete-vehicle/:id", async (req, res) => {
+  try {
+    await Addvehicle.findByIdAndDelete({ _id: req.params.id });
+    res.redirect("/allvehicle");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+app.post("/delete-guesthouse/:id", async (req, res) => {
+  try {
+    await Addguesthouse.findByIdAndDelete({ _id: req.params.id });
+    res.redirect("/allguesthouse");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/venuebook", isAdmin, function (req, res) {
+  find();
+
+  async function find() {
+    try {
+      const newvenue = await Addvenue.find();
+      res.render("venuebook", {
+        addvenues: newvenue,
+      });
+    } catch (e) {
+      console.log(e.message);
+      // Handle the error appropriately, e.g., render an error page
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+const venueSchema = {
+  Purpose: String,
+  no_of_participant: Number,
+  time_in_venue: String,
+  time_out_venue: String,
+  date: Date,
+  remark: String,
+  select_venue: String,
+  status: String,
+  admin_name: String, //who booked the venue
+};
+const Venue = mongoose.model("venue", venueSchema);
+
+app.post("/venuebook", async function (req, res) {
+  try {
+    const admin_venue = await User.findOne({ username: req.user.username });
+    // console.log(admin_venue)
+    const newvenue = new Venue({
+      Purpose: req.body.Purpose,
+      no_of_participant: req.body.no_of_participant,
+      time_in_venue: req.body.time_in_venue,
+      time_out_venue: req.body.time_out_venue,
+      date: req.body.date,
+      select_venue: req.body.select_venue,
+      remark: req.body.remark,
+      status: "Waiting",
+      admin_name: admin_venue.username,
+    });
+
+    const venuedetails = await newvenue.save();
+
+    // for mail
+    let mailTransporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      auth: {
+        user: "pj283228@gmail.com",
+        pass: "uugr lbgz hxbe ulhh",
+      },
+    });
+    const details = {
+      from: "pj283228@gmail.com",
+      to: "prachijha46212@gmail.com",
+      subject: "Request for Venue Booking",
+      text:
+        venuedetails.Purpose +
+        venuedetails.no_of_participant +
+        venuedetails.remark,
+    };
+    mailTransporter.sendMail(details, (err) => {
+      if (err) {
+        console.log("it has an error", err);
+      } else {
+        console.log("email has sent");
+      }
+    });
+    res.redirect("/venue");
+  } catch (err) {
+    console.error(err);
+    res.redirect("/venue");
+  }
+});
+
+app.get("/venue", isAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      //const vadmin_name = await User.findOne({ username: req.user.username });
+      const admin_venue = await Venue.find({ admin_name: req.user.username });
+      // console.log(admin_venue);
+      res.render("venue", {
+        created_venues: admin_venue,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+app.get("/vehicle", isAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      //const vadmin_name = await User.findOne({ username: req.user.username });
+      const admin_vehicle = await Vehicle.find({
+        admin_name: req.user.username,
+      });
+      // console.log(admin_vehicle);
+      res.render("vehicle", {
+        created_vehicles: admin_vehicle,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+app.get("/guesthouse", isAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      //const vadmin_name = await User.findOne({ username: req.user.username });
+      const admin_guesthouse = await Guesthouse.find({
+        admin_name: req.user.username,
+      });
+      //console.log(admin_guesthouse);
+      res.render("guesthouse", {
+        created_guesthouses: admin_guesthouse,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+app.post("/deleteVenue/:id", async (req, res) => {
+  try {
+    await Venue.findByIdAndDelete({ _id: req.params.id });
+    res.redirect("/venue");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/deleteVehicle/:id", async (req, res) => {
+  try {
+    await Vehicle.findByIdAndDelete({ _id: req.params.id });
+    res.redirect("/vehicle");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+app.post("/deleteGuesthouse/:id", async (req, res) => {
+  try {
+    await Guesthouse.findByIdAndDelete({ _id: req.params.id });
+    res.redirect("/guesthouse");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/requestforvenue", isvenueAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      const submitted_venue = await Venue.find();
+      // console.log(submitted_venue);
+      res.render("requestforvenue", {
+        submitted_venues: submitted_venue,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+app.get("/requestforvehicle", isvehicleAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      const submitted_vehicle = await Vehicle.find();
+      // console.log(submitted_vehicle);
+      res.render("requestforvehicle", {
+        submitted_vehicles: submitted_vehicle,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+app.get("/requestforguesthouse", isguesthouseAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      const submitted_guesthouse = await Guesthouse.find();
+      // console.log(submitted_guesthouse);
+      res.render("requestforguesthouse", {
+        submitted_guesthouses: submitted_guesthouse,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+// for vehicle booking
+app.get("/vehiclebook", isAdmin, function (req, res) {
+  find();
+
+  async function find() {
+    try {
+      const newvehicle = await Addvehicle.find();
+      res.render("vehiclebook", {
+        addvehicles: newvehicle,
+      });
+    } catch (e) {
+      console.log(e.message);
+      // Handle the error appropriately, e.g., render an error page
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+const vehicleSchema = {
+  Purpose: String,
+  date_for_vehicle: Date,
+  time_for_vehicle: String,
+  start: String,
+  end: String,
+  pickup: String,
+  dropping: String,
+  vname: String,
+  vmobile: Number,
+  no_of_pessengers: Number,
+  select_vehicle: String,
+  remark: String,
+  status: String,
+  admin_name: String,
+};
+const Vehicle = mongoose.model("vehicle", vehicleSchema);
+app.post("/vehiclebook", async function (req, res) {
+  //console.log("def");
+  try {
+    const admin_vehicle = await User.findOne({ username: req.user.username });
+    const newvehicle = new Vehicle({
+      Purpose: req.body.Purpose,
+      date_for_vehicle: req.body.date_for_vehicle,
+      time_for_vehicle: req.body.time_for_vehicle,
+      start: req.body.start,
+      end: req.body.end,
+      pickup: req.body.pickup,
+      dropping: req.body.dropping,
+      vname: req.body.vname,
+      vmobile: req.body.vmobile,
+      no_of_pessengers: req.body.no_of_pessengers,
+      select_vehicle: req.body.select_vehicle,
+      status: "Waiting",
+      admin_name: admin_vehicle.username,
+      remark: req.body.remark,
+    });
+    // console.log(newvehicle);
+    const vehicledetails = await newvehicle.save();
+
+    // for mail
+    let mailTransporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      auth: {
+        user: "pj283228@gmail.com",
+        pass: "uugr lbgz hxbe ulhh",
+      },
+    });
+    const details = {
+      from: "pj283228@gmail.com",
+      to: "prachijha46212@gmail.com",
+      subject: "Request for Vehicle Booking",
+      text:
+        vehicledetails.Purpose +
+        vehicledetails.no_of_room +
+        vehicledetails.remark,
+    };
+    mailTransporter.sendMail(details, (err) => {
+      if (err) {
+        console.log("it has an error", err);
+      } else {
+        console.log("email has sent");
+      }
+    });
+    res.redirect("/vehicle");
+  } catch (err) {
+    console.error(err);
+    res.redirect("/vehicle");
+  }
+});
+// for guesthouse booking
+app.get("/guesthousebook", isAdmin, function (req, res) {
+  find();
+
+  async function find() {
+    try {
+      const newguesthouse = await Addguesthouse.find();
+      res.render("guesthousebook", {
+        addguesthouses: newguesthouse,
+      });
+    } catch (e) {
+      console.log(e.message);
+      // Handle the error appropriately, e.g., render an error page
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+const guestSchema = {
+  guestname: String,
+  Purpose: String,
+  noofroom: Number,
+  checkin: Date,
+  checkout: Date,
+  remark: String,
+  status: String,
+  admin_name: String,
+  select_guesthouse: String,
+};
+const Guesthouse = mongoose.model("guesthouse", guestSchema);
+app.post("/guesthousebook", async function (req, res) {
+  try {
+    const admin_guesthouse = await User.findOne({
+      username: req.user.username,
+    });
+    const newguest = new Guesthouse({
+      guestname: req.body.guestname,
+      Purpose: req.body.Purpose,
+      noofroom: req.body.noofroom,
+      checkin: req.body.checkin,
+      checkout: req.body.checkout,
+      remark: req.body.remark,
+      select_guesthouse: req.body.select_guesthouse,
+      status: "Waiting",
+      admin_name: admin_guesthouse.username,
+    });
+    // console.log(newguest);
+    const guestdetails = await newguest.save();
+
+    // for mail
+    let mailTransporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      auth: {
+        user: "pj283228@gmail.com",
+        pass: "uugr lbgz hxbe ulhh",
+      },
+    });
+    const details = {
+      from: "pj283228@gmail.com",
+      to: "prachijha46212@gmail.com",
+      subject: "Request for guesthouse Booking",
+      text:
+        "Purpose for guest house booking in" +
+        guestdetails.Purpose +
+        guestdetails.noofroom +
+        guestdetails.remark,
+    };
+    mailTransporter.sendMail(details, (err) => {
+      if (err) {
+        console.log("it has an error", err);
+      } else {
+        console.log("email has sent");
+      }
+    });
+    res.redirect("/guesthouse");
+  } catch (err) {
+    console.error(err);
+    res.redirect("/guesthouse");
+  }
+});
+// for guesthouse
+app.post("/decision-guesthouse/:bookingId/:decision", async (req, res) => {
+  try {
+    const decision = req.params.decision;
+    const bookingId = req.params.bookingId;
+    await Guesthouse.updateOne(
+      { _id: bookingId },
+      { $set: { status: decision } }
+    );
+    res.redirect("/requestforguesthouse");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+app.post("/decision-vehicle/:bookingId/:decision", async (req, res) => {
+  try {
+    const decision = req.params.decision;
+    const bookingId = req.params.bookingId;
+    await Vehicle.updateOne({ _id: bookingId }, { $set: { status: decision } });
+    res.redirect("/requestforvehicle");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+app.post("/decision-venue/:bookingId/:decision", async (req, res) => {
+  try {
+    const decision = req.params.decision;
+    const bookingId = req.params.bookingId;
+    await Venue.updateOne({ _id: bookingId }, { $set: { status: decision } });
+    res.redirect("/requestforvenue");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// <<---------------------Prachi Code End------------------------>>
 
 let port = process.env.PORT;
 if ((port == null) | (port == "")) {

@@ -1,0 +1,74 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/style_new_conf.css">
+    <title>New Conference</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Book Vehicle</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="form">
+                <form action="/vehiclebook" method="POST" class="new_conf_form">
+
+                    <div class="input-group">
+                        <p class="para"> Purpose:</p>
+                        <input type="text" placeholder="" name="Purpose" value="" required>
+                        <br>
+                        <p class="para">Select the vehicle:</p>
+                        <select name="select_vehicle" id="select_vehicle" required>
+                            <option value="">Select vehicle</option>
+                            <% addvehicles.forEach(function(newvehicle) { %>
+                                <option value="<%= newvehicle.vehicle_name %>">
+                                    <%= newvehicle.vehicle_name %>
+                                </option>
+                                <% }) %>
+                        </select>
+                        <br>
+                        <p class="para">Pickup Date:</p>
+                        <input type="date" placeholder="" name="date_for_vehicle" value="" required>
+
+                        <p class="para">Pickup Time:</p>
+                        <input type="time" placeholder="" name="time_for_vehicle" value="" required>
+
+                        <br>
+                        <p class="para"> Select Start Station:</p>
+                        <input type="text" placeholder="" name="start" value="" required>
+                        <p class="para"> Select Destination Station:</p>
+                        <input type="text" placeholder="" name="end" value="" required>
+                        <br>
+                        <p class="para"> Pickup Point:</p>
+                        <input type="text" placeholder="" name="pickup" value="" required>
+
+                        <p class="para"> Dropping Point:</p>
+                        <input type="text" placeholder="" name="dropping" value="" required>
+                        <br>
+                        <p class="para"> Visting Person Name:</p>
+                        <input type="text" placeholder="" name="vname" value="" required>
+
+                        <p class="para"> Visiting Person Phone Number:</p>
+                        <input type="number" placeholder="" name="vmobile" value="" required>
+                        <br>
+                        <p class="para"> No. of Passengers:</p>
+                        <input type="number" placeholder="" name="no_of_pessengers" value="" required>
+                        <br>
+                        <p class="para"> Remark:</p>
+                        <input type="text" placeholder="" name="remark" value="" required>
+                        <br>
+                        <button class="btn">Request Booking</button>
+                    </div>
+                </form>
+
+            </div>
+            <%- include("partials/footer")-%>
+
+    </body>
+
+    </html>

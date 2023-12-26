@@ -1,0 +1,63 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>All Venues</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">All Listed Venues</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No</td>
+                    <td>Venue Name</td>
+                    <td>Delete Venue</td>
+                </tr>
+                <% let serialNumber=1 %>
+                    <% addvenues.forEach(function(newvenue){ %>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber %>
+                            </td>
+
+                            <td class="conference_name">
+                                <%= newvenue.venue_name %>
+                            </td>
+                            <td>
+                                <form action="/delete-venue/<%= newvenue._id %>" method="POST" class="delete-form">
+                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Delete</button>
+                                </form>
+                            </td>
+                            <% serialNumber++; %>
+                        </tr>
+                        <% }) %>
+                            <tr class="entry">
+                                <td colspan="3" class="serial_number">
+                                    <form action="/addvenue" method="post">
+                                        Want to Add more Venue ?
+                                        <input type="text" name="venue_name" placeholder="Add a new Venue">
+                                        <button class="edit">Add Now</button>
+                                    </form>
+                                </td>
+                            </tr>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+
+            <script>
+                function confirmDelete() {
+                    return confirm("Are you sure you want to delete this Venue?");
+                }
+            </script>
+    </body>
+
+    </html>
