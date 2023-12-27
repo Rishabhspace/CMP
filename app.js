@@ -19,6 +19,7 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const fs = require("fs");
 const pdfTable = require("pdfkit-table");
+const { el } = require("date-fns/locale");
 
 const app = express();
 
@@ -1779,7 +1780,10 @@ app.get("/guesthouse", isAdmin, function (req, res) {
 
 app.post("/deleteVenue/:id", async (req, res) => {
   try {
-    await Venue.findByIdAndDelete({ _id: req.params.id });
+    await Venue.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $set: { status: "Cancelling" } }
+    );
     res.redirect("/venue");
   } catch (error) {
     console.error(error);
@@ -1789,7 +1793,10 @@ app.post("/deleteVenue/:id", async (req, res) => {
 
 app.post("/deleteVehicle/:id", async (req, res) => {
   try {
-    await Vehicle.findByIdAndDelete({ _id: req.params.id });
+    await Vehicle.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $set: { status: "Cancelling" } }
+    );
     res.redirect("/vehicle");
   } catch (error) {
     console.error(error);
@@ -1798,7 +1805,10 @@ app.post("/deleteVehicle/:id", async (req, res) => {
 });
 app.post("/deleteGuesthouse/:id", async (req, res) => {
   try {
-    await Guesthouse.findByIdAndDelete({ _id: req.params.id });
+    await Guesthouse.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $set: { status: "Cancelling" } }
+    );
     res.redirect("/guesthouse");
   } catch (error) {
     console.error(error);
@@ -1810,7 +1820,9 @@ app.get("/requestforvenue", isvenueAdmin, function (req, res) {
   find();
   async function find() {
     try {
-      const submitted_venue = await Venue.find();
+      const submitted_venue = await Venue.find({
+        status: { $nin: ["Cancelling", "Cancelled", "Cancellation-Rejected"] },
+      });
       // console.log(submitted_venue);
       res.render("requestforvenue", {
         submitted_venues: submitted_venue,
@@ -1826,7 +1838,9 @@ app.get("/requestforvehicle", isvehicleAdmin, function (req, res) {
   find();
   async function find() {
     try {
-      const submitted_vehicle = await Vehicle.find();
+      const submitted_vehicle = await Vehicle.find({
+        status: { $nin: ["Cancelling", "Cancelled", "Cancellation-Rejected"] },
+      });
       // console.log(submitted_vehicle);
       res.render("requestforvehicle", {
         submitted_vehicles: submitted_vehicle,
@@ -1842,7 +1856,9 @@ app.get("/requestforguesthouse", isguesthouseAdmin, function (req, res) {
   find();
   async function find() {
     try {
-      const submitted_guesthouse = await Guesthouse.find();
+      const submitted_guesthouse = await Guesthouse.find({
+        status: { $nin: ["Cancelling", "Cancelled", "Cancellation-Rejected"] },
+      });
       // console.log(submitted_guesthouse);
       res.render("requestforguesthouse", {
         submitted_guesthouses: submitted_guesthouse,
@@ -1853,6 +1869,63 @@ app.get("/requestforguesthouse", isguesthouseAdmin, function (req, res) {
     }
   }
 });
+app.get("/cancellationrequestforvenue", isvenueAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      const submitted_venue = await Venue.find({
+        status: { $in: ["Cancelling", "Cancelled", "Cancellation-Rejected"] },
+      });
+      // console.log(submitted_venue);
+      res.render("cancellationrequestforvenue", {
+        submitted_venues: submitted_venue,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+app.get("/cancellationrequestforvehicle", isvehicleAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      const submitted_vehicle = await Vehicle.find({
+        status: { $in: ["Cancelling", "Cancelled", "Cancellation-Rejected"] },
+      });
+      // console.log(submitted_vehicle);
+      res.render("cancellationrequestforvehicle", {
+        submitted_vehicles: submitted_vehicle,
+      });
+    } catch (e) {
+      console.log(e.message);
+      res.render("error", { message: "An error occurred" });
+    }
+  }
+});
+
+app.get(
+  "/cancellationrequestforguesthouse",
+  isguesthouseAdmin,
+  function (req, res) {
+    find();
+    async function find() {
+      try {
+        const submitted_guesthouse = await Guesthouse.find({
+          status: { $in: ["Cancelling", "Cancelled", "Cancellation-Rejected"] },
+        });
+        // console.log(submitted_guesthouse);
+        res.render("cancellationrequestforguesthouse", {
+          submitted_guesthouses: submitted_guesthouse,
+        });
+      } catch (e) {
+        console.log(e.message);
+        res.render("error", { message: "An error occurred" });
+      }
+    }
+  }
+);
 
 // for vehicle booking
 app.get("/vehiclebook", isAdmin, function (req, res) {
@@ -2013,7 +2086,15 @@ app.post("/decision-guesthouse/:bookingId/:decision", async (req, res) => {
       { _id: bookingId },
       { $set: { status: decision } }
     );
-    res.redirect("/requestforguesthouse");
+    if (
+      decision === "Accepted" ||
+      decision === "Rejected" ||
+      decision === "Waiting"
+    ) {
+      res.redirect("/requestforguesthouse");
+    } else {
+      res.redirect("/cancellationrequestforguesthouse");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -2024,7 +2105,15 @@ app.post("/decision-vehicle/:bookingId/:decision", async (req, res) => {
     const decision = req.params.decision;
     const bookingId = req.params.bookingId;
     await Vehicle.updateOne({ _id: bookingId }, { $set: { status: decision } });
-    res.redirect("/requestforvehicle");
+    if (
+      decision === "Accepted" ||
+      decision === "Rejected" ||
+      decision === "Waiting"
+    ) {
+      res.redirect("/requestforvehicle");
+    } else {
+      res.redirect("/cancellationrequestforvehicle");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -2035,7 +2124,15 @@ app.post("/decision-venue/:bookingId/:decision", async (req, res) => {
     const decision = req.params.decision;
     const bookingId = req.params.bookingId;
     await Venue.updateOne({ _id: bookingId }, { $set: { status: decision } });
-    res.redirect("/requestforvenue");
+    if (
+      decision === "Accepted" ||
+      decision === "Rejected" ||
+      decision === "Waiting"
+    ) {
+      res.redirect("/requestforvenue");
+    } else {
+      res.redirect("/cancellationrequestforvenue");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

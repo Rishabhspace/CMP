@@ -42,9 +42,14 @@
                                 <%=admin_venue.status %>
                             </td>
                             <td class="serial_number">
-                                <form action="/deleteVenue/<%= admin_venue._id %>" method="POST" class="delete-form">
-                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Cancel</button>
-                                </form>
+                                <%if (admin_venue.status==="Accepted" ||admin_venue.status==="Rejected"
+                                    ||admin_venue.status==="Waiting" ) { %>
+                                    <form action="/deleteVenue/<%= admin_venue._id %>" method="POST"
+                                        class="delete-form">
+                                        <button name="DELETE" class="edit"
+                                            onclick="return confirmDelete()">Cancel</button>
+                                    </form>
+                                    <%}; %>
                             </td>
                             <% serialNumber++; %>
                         </tr>

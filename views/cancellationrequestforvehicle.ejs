@@ -1,0 +1,95 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="/css/sub_app.css">
+    <script src="/js/script.js"></script>
+    <title>Cancellation Request of Vehicle</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <img class="header-image" src="/images/logo_img.png" alt="">
+
+            <div class="header">
+                <p class="heading">Cancellation Request of Vehicle
+                </p>
+                <a href="/logout">
+                    <img class="logout" src="/images/logout.png" alt="">
+                    <img class="logout_text" src="/images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No</td>
+                    <td>Vehicle</td>
+                    <td>Booking Date</td>
+                    <td>Booking Time</td>
+                    <td>Purpose</td>
+                    <td>Booked by</td>
+                    <td>Decision</td>
+                </tr>
+                <% let serialNumber=1 %>
+                    <% submitted_vehicles.forEach(function(submitted_vehicle){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber %>
+                            </td>
+                            <td class="serial_number">
+                                <%= submitted_vehicle.select_vehicle%>
+                            </td>
+
+                            <td class="date">
+                                <%= formatDate(submitted_vehicle.date_for_vehicle) %>
+                            </td>
+                            <td class="date">
+                                <%= submitted_vehicle.time_for_vehicle %>
+                            </td>
+                            <td class="serial_number">
+                                <%= submitted_vehicle.Purpose %>
+                            </td>
+                            <td class="serial_number">
+                                <%= submitted_vehicle.admin_name%>
+                            </td>
+                            <td>
+                                <% if (submitted_vehicle.status==='Cancelling' ) { %>
+                                    <form action="/decision-vehicle/<%= submitted_vehicle._id %>/Cancelled"
+                                        method="POST" class="form1">
+                                        <button name="Accept" class="accept">Accept</button>
+                                    </form>
+                                    <form action="/decision-vehicle/<%= submitted_vehicle._id %>/Cancellation-Rejected"
+                                        method="POST" class="form1">
+                                        <p class="slash">/</p>
+                                        <button name="Reject" class="reject">Reject</button>
+                                    </form>
+                                    <% } else if (submitted_vehicle.status==='Cancelled' ) { %>
+                                        <p class="decision-accepted">Cancelled</p>
+                                        <form action="/decision-vehicle/<%= submitted_vehicle._id %>/Cancelling"
+                                            method="POST" class="form1">
+                                            <button name="Waiting" class="change">Change?</button>
+                                        </form>
+                                        <% } else if (submitted_vehicle.status==='Cancellation-Rejected' ) { %>
+                                            <p class="decision-rejected">Cancellation Rejected</p>
+                                            <form action="/decision-vehicle/<%= submitted_vehicle._id %>/Cancelling"
+                                                method="POST" class="form1">
+                                                <button name="Waiting" class="change">Change?</button>
+                                            </form>
+                                            <% } %>
+
+                            </td>
+                            <% serialNumber++; %>
+                        </tr>
+                        <% }) %>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+
+            <script>
+            <% function formatDate(dateString) { %>
+               <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
+               <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
+               <%       return formattedDate.split("/").join("-"); %>
+              <% } %>
+
+            </script>
+    </body>
+
+    </html>

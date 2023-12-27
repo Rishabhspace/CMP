@@ -43,10 +43,14 @@
                                 <%= admin_vehicle.status %>
                             </td>
                             <td class="serial_number">
-                                <form action="/deleteVehicle/<%= admin_vehicle._id %>" method="POST"
-                                    class="delete-form">
-                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Cancel</button>
-                                </form>
+                                <%if (admin_vehicle.status==="Accepted" ||admin_vehicle.status==="Rejected"
+                                    ||admin_vehicle.status==="Waiting" ) { %>
+                                    <form action="/deleteVehicle/<%= admin_vehicle._id %>" method="POST"
+                                        class="delete-form">
+                                        <button name="DELETE" class="edit"
+                                            onclick="return confirmDelete()">Cancel</button>
+                                    </form>
+                                    <%}; %>
                             </td>
                             <% serialNumber++; %>
                         </tr>

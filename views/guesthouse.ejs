@@ -40,10 +40,14 @@
                                 <%=admin_guesthouse.status %>
                             </td>
                             <td class="serial_number">
-                                <form action="/deleteGuesthouse/<%= admin_guesthouse._id %>" method="POST"
-                                    class="delete-form">
-                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Cancel</button>
-                                </form>
+                                <%if (admin_guesthouse.status==="Accepted" ||admin_guesthouse.status==="Rejected"
+                                    ||admin_guesthouse.status==="Waiting" ) { %>
+                                    <form action="/deleteGuesthouse/<%= admin_guesthouse._id %>" method="POST"
+                                        class="delete-form">
+                                        <button name="DELETE" class="edit"
+                                            onclick="return confirmDelete()">Cancel</button>
+                                    </form>
+                                    <%}; %>
                             </td>
                             <% serialNumber++; %>
                         </tr>
