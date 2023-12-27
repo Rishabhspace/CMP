@@ -8,8 +8,8 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
+const nodemailer = require("nodemailer");
 const _ = require("lodash");
 const { format } = require("date-fns");
 const PDFDocument = require("./pdfkit-tables");
@@ -192,6 +192,41 @@ const conferenceSchema = {
 };
 const Conference = mongoose.model("Conference", conferenceSchema);
 
+//Sending Mails
+let mailTransporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  auth: {
+    user: process.env.MAILID,
+    pass: process.env.MAILPASS,
+  },
+});
+function sendEmail(to, subject, text) {
+  let mailDetails = {
+    from: {
+      name: "Conference Management Portal | IITR",
+      address: process.env.MAILID,
+    },
+    to: to,
+    subject: subject,
+    text: text,
+  };
+  mailTransporter.sendMail(mailDetails, function (err, data) {
+    if (err) {
+      console.log("Error Occurs", err);
+    } else {
+      // console.log("Email sent successfully");
+    }
+  });
+}
+
+app.get("/sendmail/:mailId", function (req, res) {
+  var text = "This is Testing Email via get request";
+  sendEmail(req.params.mailId, "Testing Mail Via Get Method", text);
+  res.send("Mail Sent Successfully");
+});
+
 app.get("/", async function (req, res) {
   if (req.isAuthenticated()) {
     const userName = req.user.username;
@@ -208,10 +243,6 @@ app.get("/", async function (req, res) {
       res.redirect("/dashboard");
     }
   } else res.render("home");
-});
-
-app.get("/login", function (req, res) {
-  res.render("login");
 });
 
 app.get("/dashboard", function (req, res) {
@@ -1670,31 +1701,23 @@ app.post("/venuebook", async function (req, res) {
     const venuedetails = await newvenue.save();
 
     // for mail
-    let mailTransporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      auth: {
-        user: "pj283228@gmail.com",
-        pass: "uugr lbgz hxbe ulhh",
-      },
-    });
-    const details = {
-      from: "pj283228@gmail.com",
-      to: "prachijha46212@gmail.com",
-      subject: "Request for Venue Booking",
-      text:
-        venuedetails.Purpose +
-        venuedetails.no_of_participant +
-        venuedetails.remark,
-    };
-    mailTransporter.sendMail(details, (err) => {
-      if (err) {
-        console.log("it has an error", err);
-      } else {
-        console.log("email has sent");
-      }
-    });
+    var text = `Details of the booking are as follows : 
+    Purpose : ${venuedetails.Purpose} 
+    No of participants : ${venuedetails.no_of_participant}
+    Time in : ${venuedetails.time_in_venue}
+    Time out : ${venuedetails.time_out_venue}
+    Date : ${venuedetails.date}
+    Venue : ${venuedetails.select_venue}
+    Remark : ${venuedetails.remark}
+    Status : ${venuedetails.status}
+    `;
+
+    sendEmail(
+      process.env.VENUEMAIL,
+      "Venue Booking Request by " + venuedetails.admin_name,
+      text
+    );
+
     res.redirect("/venue");
   } catch (err) {
     console.error(err);
@@ -1706,7 +1729,6 @@ app.get("/venue", isAdmin, function (req, res) {
   find();
   async function find() {
     try {
-      //const vadmin_name = await User.findOne({ username: req.user.username });
       const admin_venue = await Venue.find({ admin_name: req.user.username });
       // console.log(admin_venue);
       res.render("venue", {
@@ -1889,32 +1911,24 @@ app.post("/vehiclebook", async function (req, res) {
     // console.log(newvehicle);
     const vehicledetails = await newvehicle.save();
 
-    // for mail
-    let mailTransporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      auth: {
-        user: "pj283228@gmail.com",
-        pass: "uugr lbgz hxbe ulhh",
-      },
-    });
-    const details = {
-      from: "pj283228@gmail.com",
-      to: "prachijha46212@gmail.com",
-      subject: "Request for Vehicle Booking",
-      text:
-        vehicledetails.Purpose +
-        vehicledetails.no_of_room +
-        vehicledetails.remark,
-    };
-    mailTransporter.sendMail(details, (err) => {
-      if (err) {
-        console.log("it has an error", err);
-      } else {
-        console.log("email has sent");
-      }
-    });
+    var text = `Details of the booking are as follows : 
+                Purpose : ${vehicledetails.Purpose} 
+                Date : ${vehicledetails.date_for_vehicle} 
+                Time : ${vehicledetails.time_for_vehicle} 
+                End : ${vehicledetails.end} 
+                Start : ${vehicledetails.start} 
+                Dropping : ${vehicledetails.dropping} 
+                Pickup : ${vehicledetails.pickup} 
+                Vehicle Name : ${vehicledetails.vname} 
+                Vehicle Mobile : ${vehicledetails.vmobile} 
+                No of Pessengers : ${vehicledetails.no_of_pessengers} 
+                Remark : ${vehicledetails.remark} `;
+
+    sendEmail(
+      process.env.VEHICLEEMAIL,
+      "Vehicle Booking Request by " + vehicledetails.admin_name,
+      text
+    );
     res.redirect("/vehicle");
   } catch (err) {
     console.error(err);
@@ -1970,32 +1984,20 @@ app.post("/guesthousebook", async function (req, res) {
     const guestdetails = await newguest.save();
 
     // for mail
-    let mailTransporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      auth: {
-        user: "pj283228@gmail.com",
-        pass: "uugr lbgz hxbe ulhh",
-      },
-    });
-    const details = {
-      from: "pj283228@gmail.com",
-      to: "prachijha46212@gmail.com",
-      subject: "Request for guesthouse Booking",
-      text:
-        "Purpose for guest house booking in" +
-        guestdetails.Purpose +
-        guestdetails.noofroom +
-        guestdetails.remark,
-    };
-    mailTransporter.sendMail(details, (err) => {
-      if (err) {
-        console.log("it has an error", err);
-      } else {
-        console.log("email has sent");
-      }
-    });
+    var text = `Details of the booking are as follows :
+                Guest Name : ${guestdetails.guestname}
+                Purpose : ${guestdetails.Purpose}
+                No of Rooms : ${guestdetails.noofroom}
+                Checkin : ${guestdetails.checkin}
+                Checkout : ${guestdetails.checkout}
+                Remark : ${guestdetails.remark}`;
+
+    sendEmail(
+      process.env.GUESTHOUSEMAIL,
+      "Guest House Booking Request by " + guestdetails.admin_name,
+      text
+    );
+
     res.redirect("/guesthouse");
   } catch (err) {
     console.error(err);
