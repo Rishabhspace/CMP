@@ -46,10 +46,23 @@ div {
 
 .form_heading {
     position: absolute;
-    width: 241px;
+    /* width: 241px; */
     height: 32px;
     left: 200px;
     top: 80px;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 25px;
+    line-height: 42px;
+    color: #FFFFFF;
+}
+
+.reset_form_heading {
+    position: absolute;
+    height: 32px;
+    left: 180px;
+    top: 100px;
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 600;

@@ -108,6 +108,8 @@ const userSchema = new mongoose.Schema({
   orderSignature: String,
   support_chat: [messageSchema],
   isSolved: Boolean,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -227,6 +229,118 @@ app.get("/sendmail/:mailId", function (req, res) {
   sendEmail(req.params.mailId, "Testing Mail Via Get Method", text);
   res.send("Mail Sent Successfully");
 });
+
+const sendResetEmail = (email, token) => {
+  const mailOptions = {
+    from: {
+      name: "Conference Management Portal | IITR",
+      address: process.env.MAILID,
+    },
+    to: email,
+    subject: "Password Reset",
+    text: `Click on the following link to reset your password: https://iitr.tech/set-password/${token}`,
+  };
+
+  mailTransporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    // console.log("Email sent: " + info.response);
+  });
+};
+
+const generateToken = () => {
+  return crypto.randomBytes(20).toString("hex");
+};
+// Controller to request a password reset
+const requestReset = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ username: email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .send(
+          `<script>alert('${"User not found"}'); window.location='/forgot-password';</script>`
+        );
+    }
+
+    const token = generateToken();
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+
+    await user.save();
+
+    // Send the reset email
+    sendResetEmail(email, token);
+
+    res
+      .status(200)
+      .send(
+        `<script>alert('${"Reset Email Sent"}'); window.location='/forgot-password';</script>`
+      );
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send(
+        `<script>alert('${"Internal Server Error"}'); window.location='/forgot-password';</script>`
+      );
+  }
+};
+
+// Controller to reset the password
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .send(
+          `<script>alert('${"Token Expired Generate new"}'); window.location='/forgot-password';</script>`
+        );
+    }
+
+    // Reset the password using passport-local-mongoose
+    user.setPassword(newPassword, async () => {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+
+      await user.save();
+
+      res
+        .status(200)
+        .send(
+          `<script>alert('${"Password reset Successful"}'); window.location='/';</script>`
+        );
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send(
+        `<script>alert('${"Internal Server Error"}'); window.location='/set-password';</script>`
+      );
+  }
+};
+app.get("/forgot-password", async function (req, res) {
+  res.render("home-request-reset");
+});
+app.post("/reset-request", requestReset);
+
+app.get("/set-password/:token", async function (req, res) {
+  const token = req.params.token;
+  res.render("home-password-reset", { token: token });
+});
+app.post("/reset-password", resetPassword);
 
 app.get("/", async function (req, res) {
   if (req.isAuthenticated()) {

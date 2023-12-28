@@ -1,0 +1,47 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Conference Management Portal</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="images/logo_img.png" alt="">
+            </a>
+            <div class="header">
+                <p class="heading">Conference Management Portal</p>
+            </div>
+            <div class="container">
+                <img class="login-icon-image" src="/images/loginIcon.png" alt="">
+                <p class="reset_form_heading">FORGOT PASSWORD</p>
+                <form action="/reset-request" method="POST" class="login-email" onsubmit="return validateForm()">
+                    <div class="input-group">
+                        <input type="text" placeholder="EMAIL ID" name="email" value="" id="email" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" placeholder="CONFIRM EMAIL ID" name="email" value="" id="confirmEmail"
+                            required>
+                    </div>
+                    <div class="input-group">
+                        <button name="LOG IN" class="btn">Reset</button>
+                    </div>
+                    <p class="login-register-text">Already Registered? <a href="/"><u>Log In</u></a>.</p>
+                </form>
+            </div>
+            <%- include("partials/footer")-%>
+                <script>
+                    function validateForm() {
+                        var email = document.getElementById("email").value;
+                        var confirmEmail = document.getElementById("confirmEmail").value;
+
+                        if (email !== confirmEmail) {
+                            alert("Email and Confirm Email do not match");
+                            return false; // Prevent form submission
+                        }
+
+                        return true; // Allow form submission
+                    }
+                </script>
+    </body>
+
+    </html>
