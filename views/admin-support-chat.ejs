@@ -66,10 +66,11 @@
                         var messageFlow = document.querySelector(".message-flow");
                         messageFlow.scrollTop = messageFlow.scrollHeight;
                     });
-                    var socket = io();
                     var userName = '<%=userName%>';
                     var conferenceName = '<%=conferenceName%>';
                     var confTitle = '<%= confTitle%>';
+                    var socket = io();
+                    socket.emit('join', conferenceName + userName);
                     $(() => {
                         $(".admin-send-button").click(() => {
                             let msg = $("#message").val();

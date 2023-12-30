@@ -26,6 +26,7 @@
                     <td>Payment</td>
                     <td>Guest House Booking</td>
                     <td>Upload Documents</td>
+                    <td>Group Chat</td>
                     <td>Details</td>
                 </tr>
                 <% conferenceDetails.forEach(function(conferenceDetail){%>
@@ -105,6 +106,9 @@
                                     Document-<%= i + 1 %>
                                 </a>
                                 <% } %>
+                        </td>
+                        <td>
+                            <a class="details" href="/support/<%= conferenceDetail.name %>">Join Group</a>
                         </td>
                         <td>
                             <a class="details"

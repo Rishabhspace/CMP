@@ -1399,7 +1399,7 @@ app.post("/messages/:conferenceName", async (req, res) => {
       { name: conferenceName },
       { $push: { group_chat: req.body } }
     );
-    io.emit("message", req.body);
+    io.to(conferenceName).emit("message", req.body);
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
@@ -1438,7 +1438,7 @@ app.post(
           $set: { "users.$.isSolved": false },
         }
       );
-      io.emit("message", req.body);
+      io.to(conferenceName + userName).emit("message", req.body);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
@@ -1616,8 +1616,13 @@ app.post("/isSolved/:conferenceName/:userName", async function (req, res) {
   res.sendStatus(200);
 });
 
-io.on("connection", () => {
-  // console.log("a user is connected");
+io.on("connection", (socket) => {
+  // console.log('A user connected');
+
+  socket.on("join", (room) => {
+    socket.join(room);
+    // console.log(`User joined room: ${room}`);
+  });
 });
 
 //<<---------Coded By Prachi---------------->>

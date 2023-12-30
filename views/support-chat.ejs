@@ -29,12 +29,7 @@
                     <% conferences.forEach(function(conference){%>
                         <a href="/support-chat/<%= conference.name %>" class="conference-div">
                             <div class="list-conference">
-                                <%= conference.conf_title %> Support
-                            </div>
-                        </a>
-                        <a href="/support/<%= conference.name %>" class="conference-div">
-                            <div class="list-conference">
-                                <%= conference.conf_title %> Group
+                                Support for <%= conference.conf_title %>
                             </div>
                         </a>
                         <% }) %>
@@ -70,10 +65,11 @@
                         var messageFlow = document.querySelector(".message-flow");
                         messageFlow.scrollTop = messageFlow.scrollHeight;
                     });
-                    var socket = io();
                     var userName = '<%=userName%>';
                     var conferenceName = '<%=thisConference.name%>';
                     var name = '<%=user.first_name%>';
+                    var socket = io();
+                    socket.emit('join', conferenceName + userName);
                     $(() => {
                         $(".send-button").click(() => {
                             let msg = $("#message").val();
