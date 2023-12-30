@@ -1,0 +1,33 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/admin_dashboard.css">
+    <title>Venue Admin Dashboard</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="images/logo_img.png" alt="">
+            </a>
+
+            <div class="header">
+                <p class="heading">Super Admin Dashboard</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="section">
+                <div>
+                    <p class="sec_heading">Main Section</p>
+                    <a href="/super-admin-allUsers" class="tag"> <button class="btn">All Users</button></a>
+                    <a href="/super-admin-newUser" class="tag"><button class="btn">Create New User</button></a>
+                    <a href="/super-admin-settings" class="tag"> <button class="btn">Settings</button></a>
+                </div>
+            </div>
+
+
+            <%- include("partials/footer-small-page")-%>
+    </body>
+
+    </html>

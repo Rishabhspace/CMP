@@ -1,0 +1,59 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>All Users</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="images/logo_img.png" alt="">
+            </a>
+
+            <div class="header">
+                <p class="heading">All Users</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No</td>
+                    <td>User Role</td>
+                    <td>Username</td>
+                    <td>Delete</td>
+                </tr>
+                <% let serialNumber=1 %>
+                    <% users.forEach(function(user){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber %>
+                            </td>
+                            <td class="conference_name">
+                                <%= user.role %>
+                            </td>
+                            <td class="serial_number">
+                                <%= user.username %>
+                            </td>
+                            <td class="serial_number">
+                                <form action="/super-admin-deleteUser/<%= user.username %>" method="POST"
+                                    class="delete-form">
+                                    <button name="DELETE" class="edit" onclick="return confirmDelete()">Delete</button>
+                                </form>
+                            </td>
+                            <% serialNumber++; %>
+                        </tr>
+                        <% }) %>
+            </table>
+        </div>
+        <!-- <%- include("partials/footer")-%> -->
+        <script>
+            function confirmDelete() {
+                return confirm("Are you sure you want to delete this User?");
+            }
+
+        </script>
+    </body>
+
+    </html>

@@ -1,0 +1,75 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="/css/style_new_conf.css">
+    <script src="/js/script.js"></script>
+    <title>Settings</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="/images/logo_img.png" alt="">
+            </a>
+
+            <div class="header">
+                <p class="heading">Settings</p>
+                <a href="/logout">
+                    <img class="logout" src="/images/logout.png" alt="">
+                    <img class="logout_text" src="/images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="form">
+                <form action="" method="POST" class="new_conf_form">
+                    <p class="heading2">Set All Important Settings for the Portal from here.</p>
+                    <p class="info">Be Very Cautious while changing it will impact the whole Portal.</p>
+                    <p class="para">Razorpay Key ID</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="RAZORPAY_ID_KEY" value="<%= settings.RAZORPAY_ID_KEY %>"
+                            required>
+                    </div>
+                    <br>
+                    <p class="para">Razorpay Secret Key</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="RAZORPAY_SECRET_KEY"
+                            value="<%= settings.RAZORPAY_SECRET_KEY %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Email</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="MAILID" value="<%= settings.MAILID %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Mail Password</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="MAILPASS" value="<%= settings.MAILPASS %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Venue Booking Mail ID:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="VENUEMAIL" value="<%= settings.VENUEMAIL %>" required>
+                    </div>
+                    <br>
+                    <p class="para">Guest House Booking Mail ID:</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="GUESTHOUSEMAIL" value="<%=settings.GUESTHOUSEMAIL %>"
+                            required>
+                    </div>
+                    <br>
+                    <p class="para">Vehicle Booking Mail ID</p>
+                    <div class="input-group">
+                        <input type="text" placeholder="" name="VEHICLEEMAIL" value="<%=settings.VEHICLEEMAIL %>"
+                            required>
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <button name="CREATE" class="btn">Edit Settings</button>
+                    </div>
+                </form>
+            </div>
+            <%- include("partials/footer")-%>
+        </div>
+
+
+    </body>
+
+    </html>

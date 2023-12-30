@@ -1,0 +1,63 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/style_new_conf.css">
+    <title>Create User</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="images/logo_img.png" alt="">
+            </a>
+
+            <div class="header">
+                <p class="heading">Create User</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <div class="form">
+                <form action="" method="POST" class="new_conf_form" onsubmit="return validateForm()">
+
+                    <div class="input-group">
+                        <p class="para"> Username:</p>
+                        <input type="text" placeholder="" name="username" value="" placeholder="Email" required>
+                        <br>
+                        <p class="para">Password:</p>
+                        <input type="password" placeholder="" name="password" placeholder="Password" id="password"
+                            value="" required>
+                        <br>
+                        <p class="para">Confirm Password:</p>
+                        <input type="password" placeholder="" name="confirmPassword" placeholder="Confirm Password"
+                            id="confirmPassword" value="" required>
+                        <br>
+                        <p class="para">Select the Role:</p>
+                        <select name="role" id="role" required>
+                            <option value="admin">Conference Admin</option>
+                            <option value="guesthousehead">Guest House Admin</option>
+                            <option value="venuehead">Venue Booking Admin</option>
+                            <option value="vehiclehead">Vehicle Booking Admin</option>
+                        </select>
+                        <br>
+                        <button class="btn">Create User</button>
+                    </div>
+                </form>
+
+            </div>
+            <%- include("partials/footer")-%>
+                <script>
+
+                    function validateForm() {
+                        var password = document.getElementById("password").value;
+                        var confirm_password = document.getElementById("confirmPassword").value;
+                        if (password !== confirm_password) {
+                            alert('Password and Confirm Password are not the same');
+                            return false;
+                        }
+                        return true;
+                    }
+                </script>
+    </body>
+
+    </html>

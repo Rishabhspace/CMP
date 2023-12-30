@@ -73,6 +73,17 @@ const notificationSchema = new mongoose.Schema({
 });
 // const Notification = mongoose.model("Notification",notificationSchema);
 
+const settingSchema = new mongoose.Schema({
+  RAZORPAY_ID_KEY: String,
+  RAZORPAY_SECRET_KEY: String,
+  MAILID: String,
+  MAILPASS: String,
+  VENUEMAIL: String,
+  GUESTHOUSEMAIL: String,
+  VEHICLEEMAIL: String,
+});
+const Setting = mongoose.model("Setting", settingSchema);
+
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
@@ -342,6 +353,79 @@ app.get("/set-password/:token", async function (req, res) {
 });
 app.post("/reset-password", resetPassword);
 
+//Super Admin
+app.get("/super-admin", issuperAdmin, function (req, res) {
+  res.render("super-admin-dashboard");
+});
+
+app.get("/super-admin-allUsers", issuperAdmin, async function (req, res) {
+  const users = await User.find({
+    role: { $nin: ["user", "superadmin"] },
+  }).sort({ role: 1 });
+  // console.log(users);
+  res.render("super-admin-allusers", { users: users });
+});
+
+app.post(
+  "/super-admin-deleteUser/:username",
+  issuperAdmin,
+  async function (req, res) {
+    const username = req.params.username;
+    await User.deleteOne({ username: username });
+    res.redirect("/super-admin-allUsers");
+  }
+);
+
+app.get("/super-admin-newUser", issuperAdmin, function (req, res) {
+  res.render("super-admin-createuser");
+});
+
+app.post("/super-admin-newUser", issuperAdmin, async function (req, res) {
+  try {
+    const existingUser = await User.findOne({ username: req.body.username });
+
+    if (existingUser) {
+      const alertMessage = "User already exists";
+      const script = `<script>alert('${alertMessage}'); window.location='/super-admin-newUser';</script>`;
+      return res.send(script);
+    }
+
+    User.register(
+      { username: req.body.username, role: req.body.role },
+      req.body.password,
+      function (err, user) {
+        if (err) {
+          console.log(err);
+        }
+        res.redirect("/super-admin-allUsers");
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    // Handle the error appropriately
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/super-admin-settings", issuperAdmin, async function (req, res) {
+  const settings = await Setting.findOne({});
+  res.render("super-admin-settings", { settings: settings });
+});
+
+app.post("/super-admin-settings", issuperAdmin, async function (req, res) {
+  const setting = await Setting.findOne();
+  await Setting.findByIdAndUpdate(setting._id, {
+    RAZORPAY_ID_KEY: req.body.RAZORPAY_ID_KEY,
+    RAZORPAY_SECRET_KEY: req.body.RAZORPAY_SECRET_KEY,
+    MAILID: req.body.MAILID,
+    MAILPASS: req.body.MAILPASS,
+    VENUEMAIL: req.body.VENUEMAIL,
+    GUESTHOUSEMAIL: req.body.GUESTHOUSEMAIL,
+    VEHICLEEMAIL: req.body.VEHICLEEMAIL,
+  });
+  res.redirect("/");
+});
+
 app.get("/", async function (req, res) {
   if (req.isAuthenticated()) {
     const userName = req.user.username;
@@ -356,8 +440,14 @@ app.get("/", async function (req, res) {
       res.redirect("/guesthousedashboard");
     } else if (user.role === "user") {
       res.redirect("/dashboard");
+    } else if (user.role === "superadmin") {
+      res.redirect("/super-admin");
     }
-  } else res.render("home");
+  } else {
+    const errorMessage = req.query.error;
+    // console.log(errorMessage);
+    res.render("home", { error: errorMessage });
+  }
 });
 
 app.get("/dashboard", function (req, res) {
@@ -477,12 +567,6 @@ app.get("/register/:conferenceName", function (req, res) {
 
 //Admin Portal
 
-//Only for Temporary Use -----//
-app.get("/signup", function (req, res) {
-  res.render("signup");
-});
-//Delete This Get request -----//
-
 // Middleware to check if the user is authenticated and has the required role
 function isUser(req, res, next) {
   if (req.isAuthenticated()) {
@@ -498,6 +582,27 @@ async function isAdmin(req, res, next) {
     try {
       const findUser = await User.findOne({ username: userName });
       if (findUser && findUser.role === "admin") {
+        // User found and has admin role
+        return next();
+      } else {
+        // User not found or doesn't have admin role
+        res.redirect("/");
+      }
+    } catch (error) {
+      console.error("Error finding user:", error);
+      res.redirect("/");
+    }
+  } else {
+    res.redirect("/");
+  }
+}
+
+async function issuperAdmin(req, res, next) {
+  if (req.isAuthenticated()) {
+    const userName = req.session.passport.user.username;
+    try {
+      const findUser = await User.findOne({ username: userName });
+      if (findUser && findUser.role === "superadmin") {
         // User found and has admin role
         return next();
       } else {
@@ -827,68 +932,13 @@ app.post("/decision/:conferenceName/:userName/:decision", async (req, res) => {
 
 //User Post request
 
-app.post("/", function (req, res) {
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password,
-  });
-
-  req.login(user, function (err) {
-    if (err) {
-      console.log(err);
-      res.redirect("/"); // Redirect to login page on authentication failure
-    } else {
-      passport.authenticate("local", function (err, user, info) {
-        if (err) {
-          console.log(err);
-          return res.redirect("/"); // Redirect to login page on authentication error
-        }
-
-        if (!user) {
-          return res.redirect("/"); // Redirect to login page if authentication fails
-        }
-
-        // Check user's role
-        if (user.role === "admin") {
-          // Redirect to admin dashboard
-          res.redirect("/admindashboard");
-        } else if (user.role === "user") {
-          // Redirect to user dashboard
-          res.redirect("/dashboard");
-        } else if (user.role === "venuehead") {
-          res.redirect("/venuedashboard");
-        } else if (user.role === "vehiclehead") {
-          res.redirect("/vehicledashboard");
-        } else if (user.role === "guesthousehead") {
-          res.redirect("/guesthousedashboard");
-        } else {
-          // Handle other roles or scenarios
-          res.redirect("/");
-        }
-      })(req, res, function () {
-        // This function is called after authentication is successful.
-        // You can leave it empty or add additional logic if needed.
-      });
-    }
-  });
-});
-
-app.post("/signup", function (req, res) {
-  User.register(
-    { username: req.body.username, role: "admin" },
-    req.body.password,
-    function (err, user) {
-      if (err) {
-        console.log(err);
-        res.redirect("/signup");
-      } else {
-        passport.authenticate("local")(req, res, function () {
-          res.redirect("/admindashboard");
-        });
-      }
-    }
-  );
-});
+app.post(
+  "/",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/?error=InvalidCredentials",
+  })
+);
 
 app.post(
   "/register/:conferenceName",

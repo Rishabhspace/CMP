@@ -150,6 +150,11 @@ a:active {
     color: #DCE6F0;
 }
 
+.error {
+    color: yellow;
+    text-align: center;
+}
+
 .footer {
     position: relative;
     list-style: none;
