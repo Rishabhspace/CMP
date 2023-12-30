@@ -304,8 +304,8 @@ const requestReset = async (req, res) => {
 
 // Controller to reset the password
 const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
-
+  const token = req.body.token;
+  const newPassword = req.body.newPassword;
   try {
     const user = await User.findOne({
       resetPasswordToken: token,
