@@ -1,0 +1,83 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="css/conference.css">
+    <title>Your Conferences</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="images/logo_img.png" alt="">
+            </a>
+            <div class="header">
+                <p class="heading">Your Conferences</p>
+                <a href="/logout">
+                    <img class="logout" src="images/logout.png" alt="">
+                    <img class="logout_text" src="images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <table class="table">
+                <tr class="titles">
+                    <td>S.No.</td>
+                    <td>Conference Name</td>
+                    <td>Date</td>
+                    <td>Upload Logo</td>
+                    <td>Approve E-certificate</td>
+
+                </tr>
+                <% let serialNumber=1; %>
+                    <% conferences.forEach(function(conference){%>
+                        <tr class="entry">
+                            <td class="serial_number">
+                                <%= serialNumber++ %>
+                            </td>
+                            <td class="conference_name">
+                                <%= conference.conf_title %>
+                            </td>
+                            <td>
+                                <a class="date" href="">
+                                    <%= formatDate(conference.first_day) %> to <%= formatDate(conference.last_day) %>
+                                </a>
+                            </td>
+                            <td>
+                                <form action="/e-certificate/<%= conference.name %>" method="post"
+                                    enctype="multipart/form-data" onsubmit="return validateForm()">
+                                    <input type="file" name="conferenceLogo" id="userUploadFile" class="upload-button">
+                                    <button type="submit" name="submit" class="btn-upload-document">Upload</button>
+                                </form>
+                            </td>
+                            <td>
+
+                                <a href="/approve_e-certificate/<%= conference.name %>" class="application"><u>Submitted
+                                        Applications</u></a>
+                            </td>
+                        </tr>
+                        <% }) %>
+            </table>
+        </div>
+        <%- include("partials/footer")-%>
+            <script>
+                function validateForm() {
+                    var fileInput = document.getElementById('userUploadFile');
+                    var file = fileInput.files[0];
+
+                    // Check if a file is selected
+                    if (!file) {
+                        alert('Please select your file before uploading');
+                        return false;
+                    }
+                    return true; // Form will be submitted if validation passes
+                }
+            </script>
+            <script>
+            <% function formatDate(dateString) { %>
+               <%      const options = { day: "2-digit", month: "2-digit", year: "numeric" }; %>
+               <%      const formattedDate = new Date(dateString).toLocaleDateString("en-GB", options);%>
+               <%       return formattedDate.split("/").join("-"); %>
+              <% } %>
+
+            </script>
+
+    </body>
+
+    </html>

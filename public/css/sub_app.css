@@ -67,6 +67,7 @@ div {
 
 .entry {
     background: #DCE6F0;
+    line-height: 2em;
 }
 
 .titles {
@@ -252,4 +253,18 @@ li {
 .serial_number {
     color: #102E44;
     font-size: large;
+}
+
+.btn {
+    width: 170px;
+    height: 50px;
+    background: #244862;
+    border: 1px solid #FFFFFF;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    color: #FFFFFF;
 }

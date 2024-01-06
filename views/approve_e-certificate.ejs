@@ -1,0 +1,84 @@
+<%- include("partials/header")-%>
+    <link rel="stylesheet" href="/css/sub_app.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="/js/script.js"></script>
+    <title>Approve E-certificate</title>
+    </head>
+
+    <body>
+        <div class="background">
+            <a href="/">
+                <img class="header-image" src="/images/logo_img.png" alt="">
+            </a>
+
+            <div class="header">
+                <p class="heading">Approve E-certificate for <%=conferenceName%>
+                </p>
+                <a href="/logout">
+                    <img class="logout" src="/images/logout.png" alt="">
+                    <img class="logout_text" src="/images/logout_text.png" alt="">
+                </a>
+            </div>
+
+            <form action="/approve_e-certificate/<%= conferenceShortName %>" method="POST">
+                <table class="table">
+                    <tr class="titles">
+                        <td>S.No.</td>
+                        <td>Candidate Name</td>
+                        <td>Details</td>
+                        <td><label><input type="checkbox" id="selectAll"> Select All</label></td>
+                    </tr>
+                    <% let serialNumber=1; %>
+                        <% submitted_Users.forEach(function(submitted_User){%>
+                            <% if(submitted_User.status==='Accepted' ){%>
+                                <tr class="entry">
+
+                                    <td class="serial_number">
+                                        <%= serialNumber++ %>
+                                    </td>
+                                    <td class="candidate_name">
+                                        <%= submitted_User.prefix %>
+                                            <%= submitted_User.first_name %>
+                                                <%= submitted_User.last_name %>
+                                    </td>
+                                    <td>
+                                        <a class="date"
+                                            href="/viewsubmitted/<%=conferenceShortName%>/<%= submitted_User.username %>"
+                                            target="_blank">View</a>
+                                    </td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" class="userName" name="userName"
+                                                value=<%=submitted_User.username %>
+                                            <% if(submitted_User.e_certificate) { %>checked<% } %>>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <% }%>
+                                    <% }) %>
+                                        <tr class="entry">
+                                            <td colspan="3"></td>
+                                            <td>
+                                                <input type="submit" class="btn" value="Issue Certificate">
+                                            </td>
+                                        </tr>
+                </table>
+            </form>
+        </div>
+        <%- include("partials/footer")-%>
+            <script>
+                $(document).ready(function () {
+                    $("#selectAll").change(function () {
+                        $(".userName").prop("checked", $(this).prop("checked"));
+                    });
+
+                    $(".userName").change(function () {
+                        if (!$(this).prop("checked")) {
+                            $("#selectAll").prop("checked", false);
+                        }
+                    });
+                });
+            </script>
+    </body>
+
+    </html>

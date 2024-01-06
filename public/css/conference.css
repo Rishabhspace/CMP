@@ -349,6 +349,13 @@ li {
     margin-top: 3em;
 }
 
+.btn-upload-document {
+    background: #244862;
+    border-radius: 4px;
+    color: #F8F8F8;
+    width: 90px;
+}
+
 footer p {
     margin: 0;
     /* Remove default paragraph margins */

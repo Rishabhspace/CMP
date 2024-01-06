@@ -119,6 +119,7 @@ const userSchema = new mongoose.Schema({
   orderSignature: String,
   support_chat: [messageSchema],
   isSolved: Boolean,
+  e_certificate: Boolean,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 });
@@ -178,6 +179,18 @@ const storageUserDoc = multer.diskStorage({
     cb(null, FileName + Extension);
   },
 });
+const storageLogo = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // console.log(req);
+    const fileUploadLocation = "logo/";
+    cb(null, fileUploadLocation);
+  },
+  filename: function (req, file, cb) {
+    const FileName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const Extension = path.extname(file.originalname);
+    cb(null, FileName + Extension);
+  },
+});
 
 const upload = multer({
   storage: storage,
@@ -186,6 +199,7 @@ const upload = multer({
 });
 
 const uploadDocument = multer({ storage: storageUserDoc });
+const logoUpload = multer({ storage: storageLogo });
 
 const conferenceSchema = {
   conf_title: String,
@@ -199,6 +213,7 @@ const conferenceSchema = {
   last_day: Date,
   fee: Number,
   feeCurrency: String,
+  ecertificateLogo: String,
   created_by: userSchema,
   users: [userSchema],
   group_chat: [messageSchema],
@@ -2307,6 +2322,171 @@ app.post("/decision-venue/:bookingId/:decision", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+// for e-certificate
+
+app.get("/e-certificate/:conferenceName/:userName", async (req, res) => {
+  try {
+    const conferenceName = _.lowerCase(req.params.conferenceName);
+    const userName = req.params.userName;
+    const findConference = await Conference.findOne({
+      name: conferenceName,
+    });
+    //Find if the user cerificate is issued or not
+    const issuedUser = await Conference.findOne(
+      { name: conferenceName, "users.username": userName },
+      { "users.$": 1 }
+    );
+
+    if (issuedUser && issuedUser.users[0].e_certificate) {
+      // Find the user in the array
+      const User = findConference.users.find(
+        (user) => user.username === userName
+      );
+      // console.log(User);
+      function formatDate(dateString) {
+        const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+        const formattedDate = new Date(dateString).toLocaleDateString(
+          "en-GB",
+          options
+        );
+        return formattedDate.split("/").join("-");
+      }
+      // Create a PDF document
+      const doc = new PDFDocument({
+        margin: { top: 30, right: 30, bottom: 30, left: 30 },
+        layout: "landscape",
+        size: "A4",
+      });
+
+      //Set response headers
+      res.setHeader(
+        "Content-disposition",
+        `inline; filename=${conferenceName + "_" + User.first_name + ".pdf"}`
+      );
+      res.setHeader("Content-type", "application/pdf");
+
+      // Pipe the PDF content to the response
+      doc.pipe(res);
+      // Add content to the PDF
+      doc.image("public/images/certificate.png", 0, 0, {
+        width: 840,
+        height: 595,
+      });
+
+      doc.end();
+    } else {
+      const alertMessage = "E-Certificate not Issued.";
+      const script = `<script>alert('${alertMessage}'); window.location='/';</script>`;
+      res.send(script);
+    }
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/e-certificate", isAdmin, function (req, res) {
+  find();
+  async function find() {
+    try {
+      const conf_creator = await User.findOne({ username: req.user.username });
+      const conference = await Conference.find({ created_by: conf_creator });
+      res.render("e-certificate", {
+        conferences: conference,
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+});
+
+app.get("/approve_e-certificate/:conferenceName", isAdmin, function (req, res) {
+  const conferenceName = _.lowerCase(req.params.conferenceName);
+  findConference();
+  async function findConference() {
+    try {
+      const find = await Conference.findOne({
+        name: conferenceName,
+      });
+      const confName = find.conf_title;
+      // console.log(confName);
+      const confShortName = find.name;
+      // console.log(find);
+      if (find) {
+        const submittedApplicationUser = find.users;
+        // console.log(submittedApplicationUser);
+        //Show existing Conference List
+        res.render("approve_e-certificate", {
+          findConf: find,
+          submitted_Users: submittedApplicationUser,
+          conferenceName: confName,
+          conferenceShortName: confShortName,
+        });
+      } else {
+        res.redirect("/");
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+});
+
+app.post("/approve_e-certificate/:conference_name", async (req, res) => {
+  try {
+    const conferenceName = _.lowerCase(req.params.conference_name);
+    const usernames = req.body.userName;
+
+    if (usernames) {
+      await Conference.updateMany(
+        { name: conferenceName, "users.username": { $in: usernames } },
+        { $set: { "users.$[elem].e_certificate": true } },
+        { arrayFilters: [{ "elem.username": { $in: usernames } }] }
+      );
+    }
+
+    const conference = await Conference.findOne({
+      name: conferenceName,
+    });
+    const username = conference.users.map((user) => user.username);
+
+    var filteredUsernames;
+    if (usernames)
+      filteredUsernames = username.filter((user) => !usernames.includes(user));
+    else {
+      filteredUsernames = username;
+    }
+
+    await Conference.updateMany(
+      { name: conferenceName, "users.username": { $in: filteredUsernames } },
+      { $set: { "users.$[elem].e_certificate": false } },
+      { arrayFilters: [{ "elem.username": { $in: filteredUsernames } }] }
+    );
+
+    const alertMessage = "E-Certificate generated Successfully.";
+    const escapedMessage = alertMessage.replace(/'/g, "\\'");
+    const redirectLocation = "/approve_e-certificate/" + conferenceName;
+    const script = `<script>alert('${escapedMessage}'); window.location='${redirectLocation}';</script>`;
+    res.send(script);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post(
+  "/e-certificate/:conferenceName",
+  logoUpload.single("conferenceLogo"),
+  async function (req, res) {
+    const conference = await Conference.findOne({
+      name: req.params.conferenceName,
+    });
+    conference.ecertificateLogo = req.file.path;
+    await conference.save();
+    const script = `<script>alert('Logo Uploaded Successfully.'); window.location='/e-certificate';</script>`;
+    res.send(script);
+  }
+);
 
 // <<---------------------Prachi Code End------------------------>>
 
